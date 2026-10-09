@@ -4,16 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#f97316">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Jeux">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <title>Analyse des jeux</title>
 <style>
-:root{--bg:#f7f7fa;--card:#fff;--text:#1a1a1a;--muted:#666;--accent:#4f46e5;--even:#0ea5e9;--odd:#f59e0b;--border:#e5e5ea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121214;--card:#1c1c1f;--text:#eee;--muted:#999;--border:#333}}
-:root[data-theme="dark"]{--bg:#121214;--card:#1c1c1f;--text:#eee;--muted:#999;--border:#333}
+:root{--bg:#e4e4e7;--card:#f4f4f5;--text:#27272a;--muted:#6b6b73;--accent:#f97316;--border:#c9c9cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:640px;margin-inline:auto}
@@ -23,8 +21,6 @@ h2{font-size:.95rem;margin:22px 0 8px;color:var(--muted)}
 label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:4px}
 input,select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.95rem}
 .row{display:flex;gap:10px}.row>div{flex:1}
-#grid{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap;justify-content:center}
-#grid input{width:50px;height:50px;text-align:center;font-weight:600;border:2px solid var(--border);padding:0}
 button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:pointer;background:var(--accent);color:#fff;width:100%}
 .dr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:8px}
 .dr:last-child{border:none}
@@ -39,6 +35,17 @@ button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:po
 .split span{display:flex;align-items:center;justify-content:center}
 .empty{color:var(--muted);font-size:.85rem;text-align:center;padding:10px}
 .stat{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 0}
+body{background:linear-gradient(180deg,#ececee 0%,#d4d4d8 100%) fixed;background-color:var(--bg)}
+h1{background:linear-gradient(90deg,#1d4ed8,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.card{border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.10);border-color:#d4d4d8}
+h2{color:#1d4ed8;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}
+.b{background:linear-gradient(135deg,#fb923c,#facc15);color:#2a1a00;font-weight:700;box-shadow:0 1px 4px rgba(194,65,12,.35)}
+button{background:linear-gradient(135deg,#f97316,#facc15);color:#2a1a00;font-weight:700}
+.tr .bar i{background:linear-gradient(90deg,#f97316,#facc15)}
+.tr .bar{background:#d4d4d8}
+input,select{background:#fff;border-color:var(--border)}
+input:focus,select:focus{outline:2px solid #f97316;border-color:#f97316}
+textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:.9rem;font-family:inherit}
 </style>
 </head>
 <body>
@@ -50,20 +57,15 @@ button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:po
 <div class="lg" id="tot"></div>
 </div>
 
-<div class="card"><div class="row">
-<div><label>Numéros par tirage</label><input type="number" id="cnt" min="1" max="15" value="5"></div>
-<div><label>Numéro maximum</label><input type="number" id="mx" min="5" max="99" value="90"></div>
-</div></div>
-
 <div class="card">
-<button id="genBtn" style="background:transparent;color:var(--accent);border:1px solid var(--accent)" onclick="gen()">🎲 Générer des tirages aléatoires (90 derniers jours)</button>
-<div class="lg" id="gm">Remplit les 10 tirages pour chaque jour, sans toucher aux jours déjà saisis.</div>
-</div>
-
-<div class="card">
-<label id="lbl">Nouveau tirage</label>
-<div id="grid"></div>
-<button id="addBtn" onclick="add()">➕ Ajouter ce tirage</button>
+<label>📥 Importer mes vrais numéros</label>
+<div class="lg" style="margin:0 0 8px">Une ligne par tirage : <b>date ; jeu ; numéros</b><br>Ex : 15/09/2026 ; GHANA ; 12 45 7 33 80<br>Sans le jeu (<i>date ; numéros</i>), la ligne va dans le jeu choisi en haut. Dates : jj/mm/aaaa ou aaaa-mm-jj.</div>
+<textarea id="imp" rows="6" placeholder="15/09/2026 ; GHANA ; 12 45 7 33 80&#10;15/09/2026 ; 01*Digital 7h ; 3 18 29 54 71"></textarea>
+<input type="file" id="impf" accept=".txt,.csv" style="margin:8px 0">
+<button onclick="importer()">🔄 Mise à jour</button>
+<button onclick="exporter()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📤 Exporter le jeu choisi, 30 jours (.txt)</button>
+<textarea id="exp" rows="6" readonly style="display:none;margin-top:8px"></textarea>
+<div class="lg" id="im"></div>
 </div>
 
 <h2>Historique · <span class="nm"></span> (<span id="nb">0</span> au total) · 7 derniers jours</h2>
@@ -72,6 +74,9 @@ button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:po
 <h2>Numéros les plus joués sur 30 jours · <span class="nm"></span></h2>
 <div class="card" id="top"></div>
 
+<h2>Numéros en retard sur 30 jours · <span class="nm"></span></h2>
+<div class="card" id="rt"></div>
+
 <h2>Recherche · <span class="nm"></span></h2>
 <div class="card">
 <label>Numéro fixé</label>
@@ -79,15 +84,25 @@ button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:po
 <div id="cb" style="margin-top:12px"></div>
 </div>
 
+<h2>Recherche par date</h2>
+<div class="card">
+<label>Date</label>
+<input type="date" id="sd">
+<button onclick="searchDate()" style="margin-top:8px">🔍 Rechercher</button>
+<div id="sr" style="margin-top:10px"><div class="empty">Choisis une date puis touche Rechercher.</div></div>
+</div>
+
 <h2>Duos, triplés et quadruplés · <span class="nm"></span></h2>
 <div class="card" id="du"></div>
 
 
 <script>
-var NAMES=['Digital 7h','Digital 8h','Digital 21h','Digital 22h','Première heure','Fortune','Baraka','Afterwork','GHANA','Weekend'];
+var NAMES=['01*Digital 7h','02*Digital 8h','03*Digital 21h','04*Digital 22h','05*Digital 23h','06*Première heure','07*jeux 13h','08*jeux 16h','09*Afterwork','10*GHANA'];
+var MID={'07*jeux 13h':'07*jeux*07','08*jeux 16h':'08*jeux*08'};
+var LEG={'01*Digital 7h':'Digital 7h','02*Digital 8h':'Digital 8h','03*Digital 21h':'Digital 21h','04*Digital 22h':'Digital 22h','06*Première heure':'Première heure','07*jeux 13h':'Fortune','08*jeux 16h':'Baraka','09*Afterwork':'Afterwork','10*GHANA':'GHANA'};
 var store={},cur=NAMES[0],draws=[];
 function sv(n){try{localStorage.setItem('loto_d_'+n,JSON.stringify(store[n]))}catch(e){}}
-NAMES.forEach(function(n){var a=[];try{var s=localStorage.getItem('loto_d_'+n)||(n==='Weekend'?localStorage.getItem('loto_d_Tirage 10'):null);if(s)a=(JSON.parse(s)||[]).map(function(d){if(d.t==='Tirage 10')d.t='Weekend';return d})}catch(e){}store[n]=a});
+NAMES.forEach(function(n){var a=[];try{var s=localStorage.getItem('loto_d_'+n);if(s===null&&MID[n])s=localStorage.getItem('loto_d_'+MID[n]);if(s===null&&LEG[n])s=localStorage.getItem('loto_d_'+LEG[n]);if(s)a=(JSON.parse(s)||[]).map(function(d){d.t=n;return d})}catch(e){}store[n]=a});
 try{ // reprise des anciens tirages nommés
   var old=localStorage.getItem('loto_v2');
   if(old&&!localStorage.getItem('loto_migrated')){
@@ -95,36 +110,44 @@ try{ // reprise des anciens tirages nommés
     NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1});sv(n)});
     localStorage.setItem('loto_migrated','1');
   }
-  var sc=localStorage.getItem('loto_sel');if(sc==='Tirage 10')sc='Weekend';if(sc&&store[sc])cur=sc;
+  var sc=localStorage.getItem('loto_sel');if(sc&&!store[sc]){for(var z in MID)if(MID[z]===sc)sc=z}if(sc&&!store[sc]){for(var q in LEG)if(LEG[q]===sc)sc=q}if(sc&&store[sc])cur=sc;
 }catch(e){}
 draws=store[cur];
 function dk(d){return new Date(d).toLocaleDateString('fr-FR')}
 function done(n){var k=dk(new Date());return store[n].some(function(d){return dk(d.d)===k})}
-function setCur(n){cur=n;draws=store[n];try{localStorage.setItem('loto_sel',n)}catch(e){}grid();render()}
-function cfg(){return{c:parseInt(document.getElementById('cnt').value)||5,m:parseInt(document.getElementById('mx').value)||90}}
-function grid(){var g=document.getElementById('grid');g.innerHTML='';for(var i=0;i<cfg().c;i++){var p=document.createElement('input');p.type='number';p.placeholder='#'+(i+1);g.appendChild(p)}}
-document.getElementById('cnt').addEventListener('change',function(){grid();render()});
-document.getElementById('mx').addEventListener('change',render);
-function add(){
-  if(done(cur))return;
-  var m=cfg().m,ins=document.querySelectorAll('#grid input'),nums=[];
-  for(var i=0;i<ins.length;i++){var v=parseInt(ins[i].value);if(!v||v<1||v>m){alert('Remplis tous les numéros (1 à '+m+').');return}nums.push(v)}
-  draws.unshift({n:nums,d:new Date().toISOString(),t:cur});sv(cur);
-  ins.forEach(function(x){x.value=''});render();
-}
-function gen(){
-  var c=cfg().c,m=cfg().m,added=0;
-  NAMES.forEach(function(n){
-    for(var b=90;b>=1;b--){
-      var t0=new Date(),dt=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()-b,12,0),k=dk(dt);
-      if(store[n].some(function(d){return dk(d.d)===k}))continue;
-      var set=[];while(set.length<c)set.push(1+Math.floor(Math.random()*m));
-      store[n].push({n:set,d:dt.toISOString(),t:n,s:1});added++;
-    }
-    store[n].sort(function(a,b){return a.d<b.d?1:-1});sv(n);
+function setCur(n){cur=n;draws=store[n];try{localStorage.setItem('loto_sel',n)}catch(e){}render()}
+function cfg(){return{c:5,m:90}}
+function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function pdate(t){t=t.trim();var m=t.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/),y,mo,d;
+  if(m){y=+m[1];mo=+m[2];d=+m[3]}else{m=t.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(!m)return null;d=+m[1];mo=+m[2];y=+m[3]}
+  var dt=new Date(y,mo-1,d,12,0);return(dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d)?dt:null}
+function importer(){
+  var lines=document.getElementById('imp').value.split(/\r?\n/),mx=cfg().m,ok=0,rep=0,cor=0,same=0,bad=[];
+  lines.forEach(function(line,i){
+    line=line.trim();if(!line)return;
+    var p=line.split(/[;|\t]/),dt,game,nums;
+    if(p.length>=3){dt=pdate(p[0]);var gn=norm(p[1]);game=NAMES.filter(function(n){return norm(n)===gn||norm(n.replace(/^\d+\*/,''))===gn})[0];nums=p.slice(2).join(' ')}
+    else if(p.length===2){dt=pdate(p[0]);game=cur;nums=p[1]}
+    else{bad.push(i+1);return}
+    var a=(nums.match(/\d+/g)||[]).map(Number);
+    if(!dt||!game||!a.length||a.some(function(x){return x<1||x>mx})){bad.push(i+1);return}
+    var k=dk(dt),arr=store[game],ix=-1;
+    arr.forEach(function(d,j){if(dk(d.d)===k)ix=j});
+    if(ix>=0){var o=arr[ix];if(!o.s&&JSON.stringify(o.n)===JSON.stringify(a)){same++;return}if(o.s)rep++;else cor++;arr.splice(ix,1)}
+    arr.push({n:a,d:dt.toISOString(),t:game});ok++;
   });
+  NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1});sv(n)});
   render();
-  document.getElementById('gm').textContent=added+' tirages aléatoires ajoutés (90 derniers jours).';
+  document.getElementById('im').textContent=ok+' enregistré(s)'+(cor?', dont '+cor+' corrigé(s)':'')+(rep?', dont '+rep+' aléatoire(s) remplacé(s)':'')+(same?', '+same+' déjà identique(s)':'')+(bad.length?', lignes invalides : '+bad.slice(0,10).join(', '):'')+'.';
+}
+function exporter(){
+  var im=document.getElementById('im');
+  var n0=new Date(),cut=new Date(n0.getFullYear(),n0.getMonth(),n0.getDate()-29),ex=draws.filter(function(d){return new Date(d.d)>=cut});
+  if(!ex.length){im.textContent='Aucun tirage sur les 30 derniers jours pour '+cur+'.';return}
+  var txt=ex.slice().sort(function(a,b){return a.d<b.d?-1:1}).map(function(d){return dk(d.d)+' ; '+cur+' ; '+d.n.join(' ')}).join('\n')+'\n';
+  try{var b=new Blob([txt],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=cur.replace(/\s+/g,'-')+'-30j.txt';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  var t=document.getElementById('exp');t.style.display='block';t.value=txt;
+  im.textContent=ex.length+' tirage(s) exporté(s) pour '+cur+' sur 30 jours (fichier téléchargé, texte copiable ci-dessus).';
 }
 function ball(n){return '<span class="b">'+n+'</span>'}
 function combo(){
@@ -156,18 +179,40 @@ function duos(){
   };
   el.innerHTML=sec(2,'Duos (2 numéros)')+sec(3,'Triplés (3 numéros)')+sec(4,'Quadruplés (4 numéros)');
 }
+function late(){
+  var el=document.getElementById('rt'),m=cfg().m;
+  var n0=new Date(),cut=new Date(n0.getFullYear(),n0.getMonth(),n0.getDate()-29);
+  var ds=draws.filter(function(d){return new Date(d.d)>=cut}).sort(function(a,b){return a.d<b.d?1:-1}),info={};
+  if(!ds.length){el.innerHTML='<div class="empty">Aucun tirage sur les 30 derniers jours.</div>';return}
+  ds.forEach(function(d,i){d.n.forEach(function(x){if(!(x in info))info[x]={g:i,d:d.d}})});
+  var last={};draws.forEach(function(d){d.n.forEach(function(x){if(!last[x]||d.d>last[x])last[x]=d.d})});
+  var l=[];for(var x=1;x<=m;x++)l.push({x:x,g:(x in info)?info[x].g:ds.length,d:(x in info)?info[x].d:null});
+  l.sort(function(a,b){return b.g-a.g||a.x-b.x});
+  var top=l.slice(0,10),mx=top[0].g||1;
+  el.innerHTML='<div class="lg" style="margin:0 0 6px">Tirages écoulés depuis la dernière sortie (30 derniers jours)</div>'+top.map(function(o){
+    return '<div class="tr"><span class="n">'+ball(o.x)+'</span><span class="bar"><i style="width:'+(o.g/mx*100)+'%"></i></span><span class="c" style="width:auto;min-width:130px;text-align:right;line-height:1.3">'+(o.d?o.g+' tirage(s)':'absent sur 30 jours')+'<div class="lg" style="margin:0">Dernière apparition : '+(last[o.x]?new Date(last[o.x]).toLocaleDateString('fr-FR'):'jamais sorti')+'</div></span></div>';
+  }).join('');
+}
+function searchDate(){
+  var sr=document.getElementById('sr'),v=document.getElementById('sd').value;
+  if(!v){sr.innerHTML='<div class="empty">Choisis une date.</div>';return}
+  var dt=pdate(v);if(!dt){sr.innerHTML='<div class="empty">Date invalide.</div>';return}
+  var k=dk(dt),found=0;
+  var rows=NAMES.map(function(n){
+    var d=store[n].filter(function(x){return dk(x.d)===k})[0];
+    if(d)found++;
+    return '<div class="dr"><div style="font-size:.85rem;'+(n===cur?'font-weight:700;color:var(--accent)':'')+'">'+n+'</div>'+(d?'<div class="balls">'+d.n.map(ball).join('')+'</div>':'<div class="lg" style="margin:0">Aucun résultat</div>')+'</div>';
+  }).join('');
+  sr.innerHTML='<div class="lg" style="margin:0 0 6px"><b>'+k+'</b> · '+found+' jeu(x) avec résultat</div>'+(found?rows:'<div class="empty">Aucun tirage enregistré à cette date.</div>');
+}
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
   var sl=document.getElementById('sel');
-  sl.innerHTML=NAMES.map(function(n,i){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+(i+1)+'. '+n+' ('+store[n].length+')'+(done(n)?' ✓':'')+'</option>'}).join('');
+  sl.innerHTML=NAMES.map(function(n,i){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+' ('+store[n].length+')'+(done(n)?' ✓':'')+'</option>'}).join('');
   document.querySelectorAll('.nm').forEach(function(x){x.textContent=cur});
   document.getElementById('nb').textContent=draws.length;
   document.getElementById('tot').textContent='Aujourd\u2019hui : '+NAMES.filter(done).length+'/10 tirages enregistrés';
-  var full=done(cur),bt=document.getElementById('addBtn');
-  document.getElementById('lbl').textContent=full?cur+' : déjà enregistré aujourd\u2019hui, reviens demain':'Nouveau tirage · '+cur;
-  bt.disabled=full;bt.style.opacity=full?.5:1;
-  document.querySelectorAll('#grid input').forEach(function(x){x.disabled=full});
-  combo();duos();
+  combo();duos();late();
   var h=document.getElementById('hist'),t=document.getElementById('top');
   if(!draws.length){h.innerHTML=t.innerHTML='<div class="empty">Aucun tirage enregistré pour '+cur+'.</div>';return}
   var dys=[],shown=draws.filter(function(d){var k=dk(d.d);if(dys.indexOf(k)<0)dys.push(k);return dys.indexOf(k)<=6});
@@ -185,7 +230,8 @@ function render(){
   if(!arr.length)t.innerHTML='<div class="empty">Aucun tirage sur les 30 derniers jours.</div>';else t.innerHTML='<div class="lg" style="margin:0 0 6px">Top 5, dans l\u2019ordre d\u2019enregistrement</div><div class="balls" style="margin-bottom:12px">'+seq.map(function(x,i){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0">'+(i+1)+'</div></span>'}).join('')+'</div>'+
     arr.map(function(a){return '<div class="tr"><span class="n">'+ball(a[0])+'</span><span class="bar"><i style="width:'+(a[1]/mf*100)+'%"></i></span><span class="c">'+a[1]+'×</span></div>'}).join('');
 }
-grid();render();
+document.getElementById('impf').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){document.getElementById('imp').value=r.result};r.readAsText(f)});
+render();
 </script>
 <script>
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
