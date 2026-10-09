@@ -55,6 +55,49 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <label>Jeu (chaque jeu a sa propre base)</label>
 <select id="sel" onchange="setCur(this.value)"></select>
 <div class="lg" id="tot"></div>
+<label style="margin-top:10px">Période d'analyse (top, duos, prédiction)</label>
+<select id="per" onchange="periodChanged()"><option value="def">Par défaut</option><option value="7">7 derniers jours</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="all">Tous les tirages</option></select>
+</div>
+
+<h2>Historique · <span class="nm"></span> (<span id="nb">0</span> au total) · 7 derniers jours</h2>
+<div class="card" id="hist"></div>
+
+<h2>Numéros les plus joués · <span id="plabel"></span> · <span class="nm"></span></h2>
+<div class="card" id="top"></div>
+
+<h2>Prédiction · <span class="nm"></span></h2>
+<div class="card">
+<label>Nombre de numéros</label>
+<select id="pn"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select>
+<button onclick="predict()" style="margin-top:8px">🔮 Prédiction</button>
+<div id="pr" style="margin-top:10px"><div class="empty">Touche « Prédiction » pour analyser les tirages de ce jeu.</div></div>
+</div>
+
+<h2>Recherche d'un numéro · <span class="nm"></span></h2>
+<div class="card">
+<label>Numéro</label>
+<input type="number" id="nh" min="1" max="90" placeholder="Ex : 7" oninput="numHistory()">
+<button onclick="numHistory()" style="margin-top:8px">🔍 Rechercher le numéro</button>
+<div id="nhr" style="margin-top:10px"><div class="empty">Entre un numéro puis touche le bouton.</div></div>
+</div>
+
+<h2>Numéros communs entre jeux</h2>
+<div class="card">
+<label>Date</label>
+<input type="date" id="cd">
+<button onclick="commonGames()" style="margin-top:8px">🔗 Voir les numéros communs</button>
+<div id="cgr" style="margin-top:10px"><div class="empty">Choisis une date puis touche le bouton.</div></div>
+</div>
+
+<h2>Duos, triplés et quadruplés · <span class="nm"></span></h2>
+<div class="card" id="du"></div>
+
+<h2>Recherche ancien résultat</h2>
+<div class="card">
+<label>Date</label>
+<input type="date" id="sd">
+<button onclick="searchDate()" style="margin-top:8px">🔍 Recherche ancien résultat</button>
+<div id="sr" style="margin-top:10px"><div class="empty">Choisis une date puis touche « Recherche ancien résultat ».</div></div>
 </div>
 
 <div class="card">
@@ -63,39 +106,8 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <textarea id="imp" rows="6" placeholder="15/09/2026 ; GHANA ; 12 45 7 33 80&#10;15/09/2026 ; 01*Digital 7h ; 3 18 29 54 71"></textarea>
 <input type="file" id="impf" accept=".txt,.csv" style="margin:8px 0">
 <button onclick="importer()">🔄 Mise à jour</button>
-<button onclick="exporter()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📤 Exporter le jeu choisi, 30 jours (.txt)</button>
-<button onclick="exportAll()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📦 Sauvegarde complète (tous les jeux, .txt)</button>
-<textarea id="exp" rows="6" readonly style="display:none;margin-top:8px"></textarea>
 <div class="lg" id="im"></div>
 </div>
-
-<h2>Historique · <span class="nm"></span> (<span id="nb">0</span> au total) · 7 derniers jours</h2>
-<div class="card" id="hist"></div>
-
-<h2>Numéros les plus joués sur 30 jours · <span class="nm"></span></h2>
-<div class="card" id="top"></div>
-
-<h2>Numéros en retard sur 30 jours · <span class="nm"></span></h2>
-<div class="card" id="rt"></div>
-
-<h2>Recherche · <span class="nm"></span></h2>
-<div class="card">
-<label>Numéro fixé</label>
-<input type="number" id="fx" min="1" placeholder="Ex : 7" oninput="combo()">
-<div id="cb" style="margin-top:12px"></div>
-</div>
-
-<h2>Recherche par date</h2>
-<div class="card">
-<label>Date</label>
-<input type="date" id="sd">
-<button onclick="searchDate()" style="margin-top:8px">🔍 Rechercher</button>
-<div id="sr" style="margin-top:10px"><div class="empty">Choisis une date puis touche Rechercher.</div></div>
-</div>
-
-<h2>Duos, triplés et quadruplés · <span class="nm"></span></h2>
-<div class="card" id="du"></div>
-
 
 <script>
 var NAMES=['01*Digital 7h','02*Digital 8h','03*Digital 21h','04*Digital 22h','05*Digital 23h','06*Première heure','07*jeux 13h','08*jeux 16h','09*Afterwork','10*GHANA'];
@@ -116,30 +128,32 @@ try{ // reprise des anciens tirages nommés
 draws=store[cur];
 function dk(d){return new Date(d).toLocaleDateString('fr-FR')}
 function done(n){var k=dk(new Date());return store[n].some(function(d){return dk(d.d)===k})}
-function setCur(n){cur=n;draws=store[n];try{localStorage.setItem('loto_sel',n)}catch(e){}render()}
+function setCur(n){cur=n;draws=store[n];try{localStorage.setItem('loto_sel',n)}catch(e){}resetResults();render()}
 function cfg(){return{c:5,m:90}}
 function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
 function pdate(t){t=t.trim();var m=t.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/),y,mo,d;
   if(m){y=+m[1];mo=+m[2];d=+m[3]}else{m=t.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(!m)return null;d=+m[1];mo=+m[2];y=+m[3]}
   var dt=new Date(y,mo-1,d,12,0);return(dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d)?dt:null}
+function applyShared(txt){
+  if(!txt)return;var add=0;
+  txt.split(/\r?\n/).forEach(function(line){
+    line=line.trim();if(!line)return;
+    var p=line.split(/[;|\t]/);if(p.length<3)return;
+    var dt=pdate(p[0]),gn=norm(p[1]);
+    var game=NAMES.filter(function(n){return norm(n)===gn||norm(n.replace(/^\d+\*/,''))===gn})[0];
+    var a=(p.slice(2).join(' ').match(/\d+/g)||[]).map(Number);
+    if(!dt||!game||!a.length||a.some(function(x){return x<1||x>90}))return;
+    var k=dk(dt),arr=store[game],ix=-1;
+    arr.forEach(function(d,j){if(dk(d.d)===k)ix=j});
+    if(ix>=0){if(!arr[ix].s&&!arr[ix].h)return;arr.splice(ix,1)}
+    arr.push({n:a,d:dt.toISOString(),t:game,h:1});add++;
+  });
+  if(add){NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1})});render()}
+}
 function loadShared(){
+  if(typeof EMBED==='string')applyShared(EMBED);
   if(!window.fetch)return;
-  fetch('donnees.txt',{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(txt){
-    if(!txt)return;var add=0;
-    txt.split(/\r?\n/).forEach(function(line){
-      line=line.trim();if(!line)return;
-      var p=line.split(/[;|\t]/);if(p.length<3)return;
-      var dt=pdate(p[0]),gn=norm(p[1]);
-      var game=NAMES.filter(function(n){return norm(n)===gn||norm(n.replace(/^\d+\*/,''))===gn})[0];
-      var a=(p.slice(2).join(' ').match(/\d+/g)||[]).map(Number);
-      if(!dt||!game||!a.length||a.some(function(x){return x<1||x>90}))return;
-      var k=dk(dt),arr=store[game],ix=-1;
-      arr.forEach(function(d,j){if(dk(d.d)===k)ix=j});
-      if(ix>=0){if(!arr[ix].s)return;arr.splice(ix,1)}
-      arr.push({n:a,d:dt.toISOString(),t:game,h:1});add++;
-    });
-    if(add){NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1})});render()}
-  }).catch(function(){});
+  fetch('donnees.txt',{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(applyShared).catch(function(){});
 }
 function importer(){
   var lines=document.getElementById('imp').value.split(/\r?\n/),mx=cfg().m,ok=0,rep=0,cor=0,same=0,bad=[];
@@ -160,42 +174,13 @@ function importer(){
   render();
   document.getElementById('im').textContent=ok+' enregistré(s)'+(cor?', dont '+cor+' corrigé(s)':'')+(rep?', dont '+rep+' aléatoire(s) remplacé(s)':'')+(same?', '+same+' déjà identique(s)':'')+(bad.length?', lignes invalides : '+bad.slice(0,10).join(', '):'')+'.';
 }
-function exportAll(){
-  var im=document.getElementById('im'),rows=[];
-  NAMES.forEach(function(n){store[n].forEach(function(d){rows.push([d.d,n,d.n.join(' ')])})});
-  if(!rows.length){im.textContent='Aucune donnée à sauvegarder.';return}
-  rows.sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:(a[1]<b[1]?-1:1)});
-  var txt=rows.map(function(r){return dk(r[0])+' ; '+r[1]+' ; '+r[2]}).join('\n')+'\n';
-  try{var b=new Blob([txt],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sauvegarde-jeux.txt';document.body.appendChild(a);a.click();a.remove()}catch(e){}
-  var t=document.getElementById('exp');t.style.display='block';t.value=txt;
-  im.textContent=rows.length+' tirage(s) sauvegardé(s) (fichier sauvegarde-jeux.txt téléchargé, texte copiable ci-dessus).';
-}
-function exporter(){
-  var im=document.getElementById('im');
-  var n0=new Date(),cut=new Date(n0.getFullYear(),n0.getMonth(),n0.getDate()-29),ex=draws.filter(function(d){return new Date(d.d)>=cut});
-  if(!ex.length){im.textContent='Aucun tirage sur les 30 derniers jours pour '+cur+'.';return}
-  var txt=ex.slice().sort(function(a,b){return a.d<b.d?-1:1}).map(function(d){return dk(d.d)+' ; '+cur+' ; '+d.n.join(' ')}).join('\n')+'\n';
-  try{var b=new Blob([txt],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=cur.replace(/\s+/g,'-')+'-30j.txt';document.body.appendChild(a);a.click();a.remove()}catch(e){}
-  var t=document.getElementById('exp');t.style.display='block';t.value=txt;
-  im.textContent=ex.length+' tirage(s) exporté(s) pour '+cur+' sur 30 jours (fichier téléchargé, texte copiable ci-dessus).';
-}
 function ball(n){return '<span class="b">'+n+'</span>'}
-function combo(){
-  var el=document.getElementById('cb'),v=parseInt(document.getElementById('fx').value),m=cfg().m;
-  if(!v){el.innerHTML='<div class="empty">Entre un numéro pour voir la combinaison.</div>';return}
-  if(v<1||v>m){el.innerHTML='<div class="empty">Numéro entre 1 et '+m+'.</div>';return}
-  var f={},c={},w=0;
-  draws.forEach(function(d){var has=d.n.indexOf(v)>-1;if(has)w++;d.n.forEach(function(x){f[x]=(f[x]||0)+1;if(has&&x!==v)c[x]=(c[x]||0)+1})});
-  if(!w){el.innerHTML='<div class="empty">Le '+v+' n\u2019est jamais sorti dans ce tirage.</div>';return}
-  var top=Object.keys(c).map(Number).sort(function(a,b){return c[b]-c[a]||f[b]-f[a]||a-b}).slice(0,cfg().c-1);
-  el.innerHTML='<div class="balls"><span class="b" style="background:var(--accent);outline:3px solid var(--accent);outline-offset:2px">'+v+'</span>'+top.map(ball).join('')+'</div><div class="lg">'+v+' fixé (sorti '+w+'×) + les '+top.length+' numéros le plus souvent sortis avec lui</div>'+top.map(function(x){return '<div class="stat"><span>'+x+' avec le '+v+'</span><b>'+c[x]+'×</b></div>'}).join('');
-}
 function duos(){
   var el=document.getElementById('du');
   var sd=function(d){return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})};
   var sec=function(sz,label){
     var m={};
-    draws.forEach(function(d){
+    pdr(draws,0).forEach(function(d){
       var u=d.n.filter(function(x,i){return d.n.indexOf(x)===i}).sort(function(a,b){return a-b});
       var rec=function(st,cur){if(cur.length===sz){var k=cur.join('-');(m[k]||(m[k]=[])).push(d.d);return}for(var i=st;i<u.length;i++)rec(i+1,cur.concat(u[i]))};
       rec(0,[]);
@@ -209,20 +194,6 @@ function duos(){
   };
   el.innerHTML=sec(2,'Duos (2 numéros)')+sec(3,'Triplés (3 numéros)')+sec(4,'Quadruplés (4 numéros)');
 }
-function late(){
-  var el=document.getElementById('rt'),m=cfg().m;
-  var n0=new Date(),cut=new Date(n0.getFullYear(),n0.getMonth(),n0.getDate()-29);
-  var ds=draws.filter(function(d){return new Date(d.d)>=cut}).sort(function(a,b){return a.d<b.d?1:-1}),info={};
-  if(!ds.length){el.innerHTML='<div class="empty">Aucun tirage sur les 30 derniers jours.</div>';return}
-  ds.forEach(function(d,i){d.n.forEach(function(x){if(!(x in info))info[x]={g:i,d:d.d}})});
-  var last={};draws.forEach(function(d){d.n.forEach(function(x){if(!last[x]||d.d>last[x])last[x]=d.d})});
-  var l=[];for(var x=1;x<=m;x++)l.push({x:x,g:(x in info)?info[x].g:ds.length,d:(x in info)?info[x].d:null});
-  l.sort(function(a,b){return b.g-a.g||a.x-b.x});
-  var top=l.slice(0,10),mx=top[0].g||1;
-  el.innerHTML='<div class="lg" style="margin:0 0 6px">Tirages écoulés depuis la dernière sortie (30 derniers jours)</div>'+top.map(function(o){
-    return '<div class="tr"><span class="n">'+ball(o.x)+'</span><span class="bar"><i style="width:'+(o.g/mx*100)+'%"></i></span><span class="c" style="width:auto;min-width:130px;text-align:right;line-height:1.3">'+(o.d?o.g+' tirage(s)':'absent sur 30 jours')+'<div class="lg" style="margin:0">Dernière apparition : '+(last[o.x]?new Date(last[o.x]).toLocaleDateString('fr-FR'):'jamais sorti')+'</div></span></div>';
-  }).join('');
-}
 function searchDate(){
   var sr=document.getElementById('sr'),v=document.getElementById('sd').value;
   if(!v){sr.innerHTML='<div class="empty">Choisis une date.</div>';return}
@@ -235,14 +206,101 @@ function searchDate(){
   }).join('');
   sr.innerHTML='<div class="lg" style="margin:0 0 6px"><b>'+k+'</b> · '+found+' jeu(x) avec résultat</div>'+(found?rows:'<div class="empty">Aucun tirage enregistré à cette date.</div>');
 }
+function predict(){
+  var N=parseInt(document.getElementById('pn').value)||5,out=document.getElementById('pr'),html='';
+  [cur].forEach(function(g){
+    var ds=pdr(store[g],0).sort(function(a,b){return a.d<b.d?1:-1});
+    var title='<div style="font-weight:'+(g===cur?'700':'600')+';margin:12px 0 6px'+(g===cur?';color:var(--accent)':'')+'">'+g+' <span class="lg">\u00b7 '+ds.length+' tirage(s)</span></div>';
+    if(ds.length<10){html+=title+'<div class="empty" style="padding:2px">Pas assez de tirages sur cette période (minimum 10).</div>';return}
+    var W=0,occ={},p0=5/90,m=60;
+    ds.forEach(function(d,i){var w=1;W+=w;d.n.filter(function(x,j){return d.n.indexOf(x)===j}).forEach(function(x){occ[x]=(occ[x]||0)+w})});
+    var l=[];for(var x=1;x<=90;x++)l.push({x:x,p:((occ[x]||0)+m*p0)/(W+m)});
+    l.sort(function(a,b){return b.p-a.p||a.x-b.x});
+    html+=title+'<div class="balls">'+l.slice(0,N).map(function(o){return '<span style="text-align:center">'+ball(o.x)+'<div class="lg" style="margin:2px 0 0"><b>'+(o.p*100).toFixed(1).replace('.',',')+' %</b></div></span>'}).join('')+'</div>';
+  });
+  var all=[];NAMES.forEach(function(g){pdr(store[g],0).forEach(function(d){all.push(d)})});
+  if(all.length>=10){
+    var W2=0,o2={},q0=5/90,mm=60;
+    all.forEach(function(d){W2++;d.n.filter(function(x,j){return d.n.indexOf(x)===j}).forEach(function(x){o2[x]=(o2[x]||0)+1})});
+    var l2=[];for(var y=1;y<=90;y++)l2.push({x:y,p:((o2[y]||0)+mm*q0)/(W2+mm)});
+    l2.sort(function(a,b){return b.p-a.p||a.x-b.x});
+    html+='<div style="border-top:1px solid var(--border);margin:16px 0 6px"></div><div style="font-weight:700;margin:6px 0">Tous les jeux ensemble <span class="lg">\u00b7 '+all.length+' tirage(s)</span></div><div class="balls">'+l2.slice(0,N).map(function(o){return '<span style="text-align:center">'+ball(o.x)+'<div class="lg" style="margin:2px 0 0"><b>'+(o.p*100).toFixed(1).replace('.',',')+' %</b></div></span>'}).join('')+'</div>';
+  }
+  out.innerHTML=html+'<div class="lg" style="margin-top:14px">Estimation calculée sur tous les tirages enregistrés, d\u2019abord ceux de ce jeu, puis ceux des 10 jeux réunis (chaque tirage compte pareil). Au hasard pur, chaque numéro a environ 5,6 % de chances d\u2019être tiré à chaque tirage : ces pourcentages n\u2019assurent aucun résultat.</div>';
+}
+function pdr(arr,def){
+  var v=document.getElementById('per').value,n=(v==='def')?def:(v==='all'?0:parseInt(v));
+  if(!n)return arr.slice();
+  var t=new Date(),cut=new Date(t.getFullYear(),t.getMonth(),t.getDate()-(n-1));
+  return arr.filter(function(d){return new Date(d.d)>=cut});
+}
+function plabel(def){var v=document.getElementById('per').value;return v==='def'?(def?'30 derniers jours':'tous les tirages'):(v==='all'?'tous les tirages':v+' derniers jours')}
+function resetResults(){
+  document.getElementById('pr').innerHTML='<div class="empty">Touche « Prédiction » pour analyser les tirages de ce jeu.</div>';
+  document.getElementById('nhr').innerHTML='<div class="empty">Entre un numéro puis touche le bouton.</div>';
+}
+function periodChanged(){resetResults();render()}
+function numHistory(){
+  var el=document.getElementById('nhr'),v=parseInt(document.getElementById('nh').value);
+  if(!v||v<1||v>90){el.innerHTML='<div class="empty">Entre un numéro de 1 à 90.</div>';return}
+  var ds=pdr(draws,0).sort(function(a,b){return a.d<b.d?1:-1});
+  if(!ds.length){el.innerHTML='<div class="empty">Aucun tirage pour ce jeu sur cette période.</div>';return}
+  var idx=[];ds.forEach(function(d,i){if(d.n.indexOf(v)>-1)idx.push(i)});
+  if(!idx.length){el.innerHTML='<div class="balls" style="margin-bottom:8px">'+ball(v)+'</div><div class="empty">Jamais sorti sur '+ds.length+' tirage(s).</div>';return}
+  var gaps=[];for(var i=1;i<idx.length;i++)gaps.push(idx[i]-idx[i-1]);
+  var avg=gaps.length?gaps.reduce(function(a,b){return a+b},0)/gaps.length:null;
+  var pct=(idx.length/ds.length*100).toFixed(1).replace('.',',');
+  el.innerHTML='<div class="balls" style="margin-bottom:8px">'+ball(v)+'</div>'+
+    '<div class="stat"><span>Sorti</span><b>'+idx.length+' fois sur '+ds.length+' ('+pct+' %)</b></div>'+
+    '<div class="stat"><span>Dernière sortie</span><b>'+dk(ds[idx[0]].d)+(idx[0]===0?' (dernier tirage)':' · il y a '+idx[0]+' tirage(s)')+'</b></div>'+
+    (avg!==null?'<div class="stat"><span>Écart moyen entre deux sorties</span><b>'+avg.toFixed(1).replace('.',',')+' tirages</b></div>':'')+
+    withBlock(v,ds,idx)+
+    '<div class="lg" style="margin:12px 0 4px">Dates de sortie'+(idx.length>30?' (30 plus récentes)':'')+'</div>'+
+    '<div class="lg" style="margin:0;line-height:1.7">'+idx.slice(0,30).map(function(i){return dk(ds[i].d)}).join(' \u00b7 ')+'</div>';
+}
+function withBlock(v,ds,idx){
+  var co={};
+  idx.forEach(function(i){ds[i].n.filter(function(x,j){return ds[i].n.indexOf(x)===j&&x!==v}).forEach(function(x){co[x]=(co[x]||0)+1})});
+  var f={};ds.forEach(function(d){d.n.filter(function(x,j){return d.n.indexOf(x)===j}).forEach(function(x){f[x]=(f[x]||0)+1})});
+  var l=Object.keys(co).map(Number).sort(function(a,b){return co[b]-co[a]||f[b]-f[a]||a-b});
+  if(!l.length)return '';
+  var fixed='<span class="b" style="outline:3px solid var(--accent);outline-offset:2px">'+v+'</span>';
+  return '<div class="lg" style="margin:12px 0 6px"><b>Le '+v+' fixé + les '+Math.min(4,l.length)+' qui sortent le plus avec lui</b></div>'+
+    '<div class="balls">'+fixed+l.slice(0,4).map(ball).join('')+'</div>'+
+    '<div class="lg" style="margin:12px 0 6px"><b>Numéros sortis avec le '+v+'</b> \u00b7 '+l.length+' différents'+(l.length>20?' (20 premiers)':'')+'</div>'+
+    '<div class="balls">'+l.slice(0,20).map(function(x){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0"><b>'+co[x]+'\u00d7</b></div></span>'}).join('')+'</div>';
+}
+function commonGames(){
+  var el=document.getElementById('cgr'),v=document.getElementById('cd').value;
+  if(!v){el.innerHTML='<div class="empty">Choisis une date.</div>';return}
+  var dt=pdate(v);if(!dt){el.innerHTML='<div class="empty">Date invalide.</div>';return}
+  var k=dk(dt),m={},found=0,rep=[];
+  NAMES.forEach(function(g){
+    var arr=store[g],d=arr.filter(function(x){return dk(x.d)===k})[0];
+    if(!d)return;found++;
+    var u=d.n.filter(function(x,i){return d.n.indexOf(x)===i});
+    u.forEach(function(x){(m[x]||(m[x]=[])).push(g)});
+    var prev=arr.filter(function(x){return dk(x.d)!==k&&new Date(x.d)<dt}).sort(function(a,b){return a.d<b.d?1:-1})[0];
+    if(prev){var r=u.filter(function(x){return prev.n.indexOf(x)>-1});if(r.length)rep.push({g:g,r:r,d:prev.d})}
+  });
+  if(!found){el.innerHTML='<div class="empty">Aucun tirage enregistré le '+k+'.</div>';return}
+  var com=Object.keys(m).map(Number).filter(function(x){return m[x].length>=2}).sort(function(a,b){return m[b].length-m[a].length||a-b});
+  var h='<div class="lg" style="margin:0 0 6px"><b>'+k+'</b> \u00b7 '+found+' jeu(x) avec résultat</div>';
+  h+='<div class="lg" style="margin:10px 0 4px"><b>Numéros sortis dans plusieurs jeux</b> \u00b7 '+com.length+'</div>';
+  h+=com.length?com.map(function(x){return '<div class="dr"><div class="balls">'+ball(x)+'</div><div class="lg" style="margin:0;text-align:right"><b>'+m[x].length+' jeux</b> : '+m[x].join(', ')+'</div></div>'}).join(''):'<div class="empty" style="padding:2px">Aucun</div>';
+  h+='<div class="lg" style="margin:12px 0 4px"><b>Répétés depuis le tirage précédent du même jeu</b> \u00b7 '+rep.length+' jeu(x)</div>';
+  h+=rep.length?rep.map(function(o){return '<div class="dr"><div style="font-size:.85rem">'+o.g+'</div><div class="balls">'+o.r.map(ball).join('')+'</div></div>'}).join(''):'<div class="empty" style="padding:2px">Aucun</div>';
+  el.innerHTML=h;
+}
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
   var sl=document.getElementById('sel');
   sl.innerHTML=NAMES.map(function(n,i){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+' ('+store[n].length+')'+(done(n)?' ✓':'')+'</option>'}).join('');
   document.querySelectorAll('.nm').forEach(function(x){x.textContent=cur});
   document.getElementById('nb').textContent=draws.length;
+  document.getElementById('plabel').textContent=plabel(30);
   document.getElementById('tot').textContent='Aujourd\u2019hui : '+NAMES.filter(done).length+'/10 tirages enregistrés';
-  combo();duos();late();
+  duos();
   var h=document.getElementById('hist'),t=document.getElementById('top');
   if(!draws.length){h.innerHTML=t.innerHTML='<div class="empty">Aucun tirage enregistré pour '+cur+'.</div>';return}
   var dys=[],shown=draws.filter(function(d){var k=dk(d.d);if(dys.indexOf(k)<0)dys.push(k);return dys.indexOf(k)<=6});
@@ -251,13 +309,13 @@ function render(){
     return '<div class="dr"><div><div class="balls">'+d.n.map(ball).join('')+'</div><div class="lg">'+dk(d.d)+(d.s?' · 🎲 aléatoire':'')+tg+'</div></div><span title="Verrouillé">🔒</span></div>';
   }).join('');
   var fm={};
-  var now=new Date(),cut=new Date(now.getFullYear(),now.getMonth(),now.getDate()-29),md=draws.filter(function(d){return new Date(d.d)>=cut});
+  var md=pdr(draws,30);
   md.forEach(function(d){d.n.forEach(function(x){fm[x]=(fm[x]||0)+1})});
   var arr=Object.keys(fm).map(function(k){return[+k,fm[k]]}).sort(function(a,b){return b[1]-a[1]||a[0]-b[0]}).slice(0,10);
   var mf=arr.length?arr[0][1]:1;
   var tp=arr.slice(0,5).map(function(a){return a[0]}),seq=[];
   for(var i=md.length-1;i>=0;i--)md[i].n.forEach(function(x){if(tp.indexOf(x)>-1&&seq.indexOf(x)<0)seq.push(x)});
-  if(!arr.length)t.innerHTML='<div class="empty">Aucun tirage sur les 30 derniers jours.</div>';else t.innerHTML='<div class="lg" style="margin:0 0 6px">Top 5, dans l\u2019ordre d\u2019enregistrement</div><div class="balls" style="margin-bottom:12px">'+seq.map(function(x,i){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0">'+(i+1)+'</div></span>'}).join('')+'</div>'+
+  if(!arr.length)t.innerHTML='<div class="empty">Aucun tirage sur cette période.</div>';else t.innerHTML='<div class="lg" style="margin:0 0 6px">Top 5, dans l\u2019ordre d\u2019enregistrement</div><div class="balls" style="margin-bottom:12px">'+seq.map(function(x,i){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0">'+(i+1)+'</div></span>'}).join('')+'</div>'+
     arr.map(function(a){return '<div class="tr"><span class="n">'+ball(a[0])+'</span><span class="bar"><i style="width:'+(a[1]/mf*100)+'%"></i></span><span class="c">'+a[1]+'×</span></div>'}).join('');
 }
 document.getElementById('impf').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){document.getElementById('imp').value=r.result};r.readAsText(f)});
