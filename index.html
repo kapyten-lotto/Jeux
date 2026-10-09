@@ -64,6 +64,7 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <input type="file" id="impf" accept=".txt,.csv" style="margin:8px 0">
 <button onclick="importer()">🔄 Mise à jour</button>
 <button onclick="exporter()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📤 Exporter le jeu choisi, 30 jours (.txt)</button>
+<button onclick="exportAll()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📦 Sauvegarde complète (tous les jeux, .txt)</button>
 <textarea id="exp" rows="6" readonly style="display:none;margin-top:8px"></textarea>
 <div class="lg" id="im"></div>
 </div>
@@ -101,7 +102,7 @@ var NAMES=['01*Digital 7h','02*Digital 8h','03*Digital 21h','04*Digital 22h','05
 var MID={'07*jeux 13h':'07*jeux*07','08*jeux 16h':'08*jeux*08'};
 var LEG={'01*Digital 7h':'Digital 7h','02*Digital 8h':'Digital 8h','03*Digital 21h':'Digital 21h','04*Digital 22h':'Digital 22h','06*Première heure':'Première heure','07*jeux 13h':'Fortune','08*jeux 16h':'Baraka','09*Afterwork':'Afterwork','10*GHANA':'GHANA'};
 var store={},cur=NAMES[0],draws=[];
-function sv(n){try{localStorage.setItem('loto_d_'+n,JSON.stringify(store[n]))}catch(e){}}
+function sv(n){try{localStorage.setItem('loto_d_'+n,JSON.stringify(store[n].filter(function(d){return !d.h})))}catch(e){}}
 NAMES.forEach(function(n){var a=[];try{var s=localStorage.getItem('loto_d_'+n);if(s===null&&MID[n])s=localStorage.getItem('loto_d_'+MID[n]);if(s===null&&LEG[n])s=localStorage.getItem('loto_d_'+LEG[n]);if(s)a=(JSON.parse(s)||[]).map(function(d){d.t=n;return d})}catch(e){}store[n]=a});
 try{ // reprise des anciens tirages nommés
   var old=localStorage.getItem('loto_v2');
@@ -121,6 +122,25 @@ function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f
 function pdate(t){t=t.trim();var m=t.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/),y,mo,d;
   if(m){y=+m[1];mo=+m[2];d=+m[3]}else{m=t.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(!m)return null;d=+m[1];mo=+m[2];y=+m[3]}
   var dt=new Date(y,mo-1,d,12,0);return(dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d)?dt:null}
+function loadShared(){
+  if(!window.fetch)return;
+  fetch('donnees.txt',{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(txt){
+    if(!txt)return;var add=0;
+    txt.split(/\r?\n/).forEach(function(line){
+      line=line.trim();if(!line)return;
+      var p=line.split(/[;|\t]/);if(p.length<3)return;
+      var dt=pdate(p[0]),gn=norm(p[1]);
+      var game=NAMES.filter(function(n){return norm(n)===gn||norm(n.replace(/^\d+\*/,''))===gn})[0];
+      var a=(p.slice(2).join(' ').match(/\d+/g)||[]).map(Number);
+      if(!dt||!game||!a.length||a.some(function(x){return x<1||x>90}))return;
+      var k=dk(dt),arr=store[game],ix=-1;
+      arr.forEach(function(d,j){if(dk(d.d)===k)ix=j});
+      if(ix>=0){if(!arr[ix].s)return;arr.splice(ix,1)}
+      arr.push({n:a,d:dt.toISOString(),t:game,h:1});add++;
+    });
+    if(add){NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1})});render()}
+  }).catch(function(){});
+}
 function importer(){
   var lines=document.getElementById('imp').value.split(/\r?\n/),mx=cfg().m,ok=0,rep=0,cor=0,same=0,bad=[];
   lines.forEach(function(line,i){
@@ -139,6 +159,16 @@ function importer(){
   NAMES.forEach(function(n){store[n].sort(function(a,b){return a.d<b.d?1:-1});sv(n)});
   render();
   document.getElementById('im').textContent=ok+' enregistré(s)'+(cor?', dont '+cor+' corrigé(s)':'')+(rep?', dont '+rep+' aléatoire(s) remplacé(s)':'')+(same?', '+same+' déjà identique(s)':'')+(bad.length?', lignes invalides : '+bad.slice(0,10).join(', '):'')+'.';
+}
+function exportAll(){
+  var im=document.getElementById('im'),rows=[];
+  NAMES.forEach(function(n){store[n].forEach(function(d){rows.push([d.d,n,d.n.join(' ')])})});
+  if(!rows.length){im.textContent='Aucune donnée à sauvegarder.';return}
+  rows.sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:(a[1]<b[1]?-1:1)});
+  var txt=rows.map(function(r){return dk(r[0])+' ; '+r[1]+' ; '+r[2]}).join('\n')+'\n';
+  try{var b=new Blob([txt],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sauvegarde-jeux.txt';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  var t=document.getElementById('exp');t.style.display='block';t.value=txt;
+  im.textContent=rows.length+' tirage(s) sauvegardé(s) (fichier sauvegarde-jeux.txt téléchargé, texte copiable ci-dessus).';
 }
 function exporter(){
   var im=document.getElementById('im');
@@ -231,7 +261,7 @@ function render(){
     arr.map(function(a){return '<div class="tr"><span class="n">'+ball(a[0])+'</span><span class="bar"><i style="width:'+(a[1]/mf*100)+'%"></i></span><span class="c">'+a[1]+'×</span></div>'}).join('');
 }
 document.getElementById('impf').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){document.getElementById('imp').value=r.result};r.readAsText(f)});
-render();
+render();loadShared();
 </script>
 <script>
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
