@@ -81,14 +81,6 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <div id="nhr" style="margin-top:10px"><div class="empty">Entre un numéro puis touche le bouton.</div></div>
 </div>
 
-<h2>Numéros communs entre jeux</h2>
-<div class="card">
-<label>Date</label>
-<input type="date" id="cd">
-<button onclick="commonGames()" style="margin-top:8px">🔗 Voir les numéros communs</button>
-<div id="cgr" style="margin-top:10px"><div class="empty">Choisis une date puis touche le bouton.</div></div>
-</div>
-
 <h2>Duos, triplés et quadruplés · <span class="nm"></span></h2>
 <div class="card" id="du"></div>
 
@@ -105,7 +97,10 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <div class="lg" style="margin:0 0 8px">Une ligne par tirage : <b>date ; jeu ; numéros</b><br>Ex : 15/09/2026 ; GHANA ; 12 45 7 33 80<br>Sans le jeu (<i>date ; numéros</i>), la ligne va dans le jeu choisi en haut. Dates : jj/mm/aaaa ou aaaa-mm-jj.</div>
 <textarea id="imp" rows="6" placeholder="15/09/2026 ; GHANA ; 12 45 7 33 80&#10;15/09/2026 ; 01*Digital 7h ; 3 18 29 54 71"></textarea>
 <input type="file" id="impf" accept=".txt,.csv" style="margin:8px 0">
-<button onclick="importer()">🔄 Mise à jour</button>
+<input type="password" id="pw" placeholder="Mot de passe (mise à jour et export)" autocomplete="off" style="margin-bottom:8px">
+<button onclick="miseAJour()">🔄 Mise à jour</button>
+<button onclick="exportAll()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📤 Exporter (tous les jeux, .txt)</button>
+<textarea id="exp" rows="6" readonly style="display:none;margin-top:8px"></textarea>
 <div class="lg" id="im"></div>
 </div>
 
@@ -154,6 +149,33 @@ function loadShared(){
   if(typeof EMBED==='string')applyShared(EMBED);
   if(!window.fetch)return;
   fetch('donnees.txt',{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(applyShared).catch(function(){});
+}
+var SALT='jeux-export-v1',PWH='3ce6abc7eec8ba564803520530b53695b51b9b9f2ffd96680aa4a7557c562f7b';
+function checkPw(ok){
+  var im=document.getElementById('im'),pw=document.getElementById('pw');
+  if(!pw.value){im.textContent='Entre le mot de passe.';return}
+  if(!(window.crypto&&crypto.subtle)){im.textContent='Action impossible : connexion non sécurisée sur ce navigateur.';return}
+  var enc=new TextEncoder();
+  crypto.subtle.importKey('raw',enc.encode(pw.value),'PBKDF2',false,['deriveBits']).then(function(k){
+    return crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(SALT),iterations:150000,hash:'SHA-256'},k,256);
+  }).then(function(bits){
+    var hex=Array.from(new Uint8Array(bits)).map(function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
+    pw.value='';
+    if(hex!==PWH){im.textContent='Mot de passe incorrect.';return}
+    ok();
+  }).catch(function(){im.textContent='Vérification impossible.'});
+}
+function exportAll(){checkPw(doExport)}
+function miseAJour(){checkPw(importer)}
+function doExport(){
+  var im=document.getElementById('im'),rows=[];
+  NAMES.forEach(function(n){store[n].forEach(function(d){rows.push([d.d,n,d.n.join(' ')])})});
+  if(!rows.length){im.textContent='Aucune donnée à exporter.';return}
+  rows.sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:(a[1]<b[1]?-1:1)});
+  var txt=rows.map(function(r){return dk(r[0])+' ; '+r[1]+' ; '+r[2]}).join('\n')+'\n';
+  try{var b=new Blob([txt],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='export-jeux.txt';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  var t=document.getElementById('exp');t.style.display='block';t.value=txt;
+  im.textContent=rows.length+' tirage(s) exporté(s) (fichier export-jeux.txt téléchargé, texte copiable ci-dessus).';
 }
 function importer(){
   var lines=document.getElementById('imp').value.split(/\r?\n/),mx=cfg().m,ok=0,rep=0,cor=0,same=0,bad=[];
@@ -269,28 +291,6 @@ function withBlock(v,ds,idx){
     '<div class="balls">'+fixed+l.slice(0,4).map(ball).join('')+'</div>'+
     '<div class="lg" style="margin:12px 0 6px"><b>Numéros sortis avec le '+v+'</b> \u00b7 '+l.length+' différents'+(l.length>20?' (20 premiers)':'')+'</div>'+
     '<div class="balls">'+l.slice(0,20).map(function(x){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0"><b>'+co[x]+'\u00d7</b></div></span>'}).join('')+'</div>';
-}
-function commonGames(){
-  var el=document.getElementById('cgr'),v=document.getElementById('cd').value;
-  if(!v){el.innerHTML='<div class="empty">Choisis une date.</div>';return}
-  var dt=pdate(v);if(!dt){el.innerHTML='<div class="empty">Date invalide.</div>';return}
-  var k=dk(dt),m={},found=0,rep=[];
-  NAMES.forEach(function(g){
-    var arr=store[g],d=arr.filter(function(x){return dk(x.d)===k})[0];
-    if(!d)return;found++;
-    var u=d.n.filter(function(x,i){return d.n.indexOf(x)===i});
-    u.forEach(function(x){(m[x]||(m[x]=[])).push(g)});
-    var prev=arr.filter(function(x){return dk(x.d)!==k&&new Date(x.d)<dt}).sort(function(a,b){return a.d<b.d?1:-1})[0];
-    if(prev){var r=u.filter(function(x){return prev.n.indexOf(x)>-1});if(r.length)rep.push({g:g,r:r,d:prev.d})}
-  });
-  if(!found){el.innerHTML='<div class="empty">Aucun tirage enregistré le '+k+'.</div>';return}
-  var com=Object.keys(m).map(Number).filter(function(x){return m[x].length>=2}).sort(function(a,b){return m[b].length-m[a].length||a-b});
-  var h='<div class="lg" style="margin:0 0 6px"><b>'+k+'</b> \u00b7 '+found+' jeu(x) avec résultat</div>';
-  h+='<div class="lg" style="margin:10px 0 4px"><b>Numéros sortis dans plusieurs jeux</b> \u00b7 '+com.length+'</div>';
-  h+=com.length?com.map(function(x){return '<div class="dr"><div class="balls">'+ball(x)+'</div><div class="lg" style="margin:0;text-align:right"><b>'+m[x].length+' jeux</b> : '+m[x].join(', ')+'</div></div>'}).join(''):'<div class="empty" style="padding:2px">Aucun</div>';
-  h+='<div class="lg" style="margin:12px 0 4px"><b>Répétés depuis le tirage précédent du même jeu</b> \u00b7 '+rep.length+' jeu(x)</div>';
-  h+=rep.length?rep.map(function(o){return '<div class="dr"><div style="font-size:.85rem">'+o.g+'</div><div class="balls">'+o.r.map(ball).join('')+'</div></div>'}).join(''):'<div class="empty" style="padding:2px">Aucun</div>';
-  el.innerHTML=h;
 }
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
