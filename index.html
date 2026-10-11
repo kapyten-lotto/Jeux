@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f97316">
+<meta name="theme-color" content="#26262b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Jeux">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -14,7 +14,8 @@
 :root{--bg:#e4e4e7;--card:#f4f4f5;--text:#27272a;--muted:#6b6b73;--accent:#f97316;--border:#c9c9cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:640px;margin-inline:auto}
+html{font-size:14px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:0}
 h1{font-size:1.3rem;margin:4px 0 12px}
 h2{font-size:.95rem;margin:22px 0 8px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
@@ -27,7 +28,7 @@ button{border:none;border-radius:8px;padding:10px 14px;font-size:.9rem;cursor:po
 .balls{display:flex;gap:5px;flex-wrap:wrap}
 .b{border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#fff}
 .b{background:var(--accent)}
-.lg{font-size:.75rem;color:var(--muted);margin-top:6px}
+.lg{font-size:.8rem;color:var(--muted);margin-top:6px}
 .tr{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.85rem}
 .tr .n{width:30px;text-align:center}.tr .bar{flex:1;height:10px;background:var(--border);border-radius:6px;overflow:hidden}
 .tr .bar i{display:block;height:100%;background:var(--accent)}.tr .c{width:44px;text-align:right;color:var(--muted)}
@@ -46,26 +47,57 @@ button{background:linear-gradient(135deg,#f97316,#facc15);color:#2a1a00;font-wei
 input,select{background:#fff;border-color:var(--border)}
 input:focus,select:focus{outline:2px solid #f97316;border-color:#f97316}
 textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:.9rem;font-family:inherit}
+.app{display:flex;min-height:100vh}
+.side{width:272px;flex:none;background:#26262b;color:#d4d4d8;display:flex;flex-direction:column;padding:24px 16px;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#d4d4d8;font-size:13px;min-height:44px;text-decoration:none}
+.side a:hover{background:#34343b}
+.side a.on{background:#f97316;color:#1a1000;font-weight:800}
+.side .n{width:26px;height:26px;border-radius:8px;background:#3a3a42;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:none}
+.side a.on .n{background:#1a1000;color:#fdba74}
+.side .ck{margin-left:auto;font-size:11px;color:#fdba74}
+.side a.on .ck{color:#1a1000}
+.side .lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a1a1aa;margin:18px 12px 6px}
+.brand{padding:4px 12px 14px}.brand b{display:block;font-size:17px;color:#fff}.brand small{font-size:11px;color:#a1a1aa}
+#games{display:contents}
+.main{flex:1;min-width:0;padding:28px 36px;max-width:1000px}
+.mhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.mhead h1{font-size:1.8rem;margin:2px 0 0}
+.mhead .per{min-width:220px}
+@media(max-width:860px){.app{flex-direction:column}.side{position:static;width:auto;height:auto;flex-direction:row;overflow-x:auto;padding:12px;gap:8px}.side .lbl,.side .sec,.side .adm,.brand{display:none}.side a{flex:none;white-space:nowrap}.main{padding:16px}}
 </style>
 </head>
 <body>
-<h1>🎯 Analyse des jeux</h1>
-
-<div class="card">
-<label>Jeu (chaque jeu a sa propre base)</label>
-<select id="sel" onchange="setCur(this.value)"></select>
-<div class="lg" id="tot"></div>
-<label style="margin-top:10px">Période d'analyse (top, duos, prédiction)</label>
-<select id="per" onchange="periodChanged()"><option value="def">Par défaut</option><option value="7">7 derniers jours</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="all">Tous les tirages</option></select>
+<div class="app">
+<nav class="side" aria-label="Jeux et analyses">
+<div class="brand"><b>Analyse des jeux</b><small>Loto Bonheur et GhanaYello</small></div>
+<div class="lbl">Jeux</div>
+<div id="games"></div>
+<div class="lbl sec">Analyses</div>
+<a class="sec" href="#s-hist"><span class="n">H</span>Historique</a>
+<a class="sec" href="#s-top"><span class="n">T</span>Numéros les plus joués</a>
+<a class="sec" href="#s-pred"><span class="n">P</span>Prédiction</a>
+<a class="sec" href="#s-num"><span class="n">N</span>Recherche d'un numéro</a>
+<a class="sec" href="#s-pair"><span class="n">R</span>Recherche d'une paire</a>
+<a class="sec" href="#s-duo"><span class="n">D</span>Duos et triplés</a>
+<a class="sec" href="#s-miss"><span class="n">X</span>Numéros non tirés</a>
+<a class="sec" href="#s-old"><span class="n">A</span>Ancien résultat</a>
+<div class="lbl adm">Administration</div>
+<a class="adm" href="#s-maj"><span class="n">M</span>Mise à jour et export</a>
+</nav>
+<main class="main">
+<div class="mhead">
+<div><div class="lg" style="margin:0">Jeu sélectionné (chaque jeu a sa propre base)</div><h1 id="gtitle"></h1></div>
+<div class="per"><label for="per">Période d'analyse (top, duos, prédiction)</label><select id="per" onchange="periodChanged()"><option value="def">Par défaut</option><option value="7">7 derniers jours</option><option value="14">14 derniers jours</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="all">Tous les tirages</option></select></div>
 </div>
+<div class="lg" id="tot" style="margin:0 0 4px"></div>
 
-<h2>Historique · <span class="nm"></span> (<span id="nb">0</span> au total) · 7 derniers jours</h2>
+<h2 id="s-hist">Historique · <span class="nm"></span> (<span id="nb">0</span> au total) · 7 derniers jours</h2>
 <div class="card" id="hist"></div>
 
-<h2>Numéros les plus joués · <span id="plabel"></span> · <span class="nm"></span></h2>
+<h2 id="s-top">Numéros les plus joués · <span id="plabel"></span> · <span class="nm"></span></h2>
 <div class="card" id="top"></div>
 
-<h2>Prédiction · <span class="nm"></span></h2>
+<h2 id="s-pred">Prédiction · <span class="nm"></span></h2>
 <div class="card">
 <label>Nombre de numéros</label>
 <select id="pn"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select>
@@ -73,7 +105,7 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <div id="pr" style="margin-top:10px"><div class="empty">Touche « Prédiction » pour analyser les tirages de ce jeu.</div></div>
 </div>
 
-<h2>Recherche d'un numéro · <span class="nm"></span></h2>
+<h2 id="s-num">Recherche d'un numéro · <span class="nm"></span></h2>
 <div class="card">
 <label>Numéro</label>
 <input type="number" id="nh" min="1" max="90" placeholder="Ex : 7" oninput="numHistory()">
@@ -81,10 +113,25 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <div id="nhr" style="margin-top:10px"><div class="empty">Entre un numéro puis touche le bouton.</div></div>
 </div>
 
-<h2>Duos, triplés et quadruplés · <span class="nm"></span></h2>
-<div class="card" id="du"></div>
+<h2 id="s-pair">Recherche d'une paire de numéros · tous les jeux · <span id="pairlabel"></span></h2>
+<div class="card">
+<label>Deux numéros</label>
+<input type="text" id="pp" inputmode="numeric" placeholder="Ex : 12 45" oninput="pairSearch()">
+<button onclick="pairSearch()" style="margin-top:8px">🔍 Rechercher la paire</button>
+<div id="ppr" style="margin-top:10px"><div class="empty">Entre deux numéros (de 1 à 90).</div></div>
+</div>
 
-<h2>Recherche ancien résultat</h2>
+<h2 id="s-duo">Duos, triplés et quadruplés · <span class="nm"></span></h2>
+<div class="card">
+<label>Rechercher dans les duos, triplés et quadruplés</label>
+<input type="text" id="dq" inputmode="numeric" placeholder="Ex : 65 ou 65 21" oninput="duos()">
+<div id="du" style="margin-top:10px"></div>
+</div>
+
+<h2 id="s-miss">Numéros non tirés · <span id="mlabel"></span> · <span class="nm"></span></h2>
+<div class="card" id="nd"></div>
+
+<h2 id="s-old">Recherche ancien résultat</h2>
 <div class="card">
 <label>Date</label>
 <input type="date" id="sd">
@@ -92,7 +139,7 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <div id="sr" style="margin-top:10px"><div class="empty">Choisis une date puis touche « Recherche ancien résultat ».</div></div>
 </div>
 
-<div class="card">
+<div class="card" id="s-maj">
 <label>📥 Importer mes vrais numéros</label>
 <div class="lg" style="margin:0 0 8px">Une ligne par tirage : <b>date ; jeu ; numéros</b><br>Ex : 15/09/2026 ; GHANA ; 12 45 7 33 80<br>Sans le jeu (<i>date ; numéros</i>), la ligne va dans le jeu choisi en haut. Dates : jj/mm/aaaa ou aaaa-mm-jj.</div>
 <textarea id="imp" rows="6" placeholder="15/09/2026 ; GHANA ; 12 45 7 33 80&#10;15/09/2026 ; 01*Digital 7h ; 3 18 29 54 71"></textarea>
@@ -102,6 +149,8 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <button onclick="exportAll()" style="margin-top:8px;background:transparent;color:var(--accent);border:1px solid var(--accent)">📤 Exporter (tous les jeux, .txt)</button>
 <textarea id="exp" rows="6" readonly style="display:none;margin-top:8px"></textarea>
 <div class="lg" id="im"></div>
+</div>
+</main>
 </div>
 
 <script>
@@ -121,6 +170,7 @@ try{ // reprise des anciens tirages nommés
   var sc=localStorage.getItem('loto_sel');if(sc&&!store[sc]){for(var z in MID)if(MID[z]===sc)sc=z}if(sc&&!store[sc]){for(var q in LEG)if(LEG[q]===sc)sc=q}if(sc&&store[sc])cur=sc;
 }catch(e){}
 draws=store[cur];
+function jour(d){var j=new Date(d).toLocaleDateString('fr-FR',{weekday:'long'});return j.charAt(0).toUpperCase()+j.slice(1)}
 function dk(d){return new Date(d).toLocaleDateString('fr-FR')}
 function done(n){var k=dk(new Date());return store[n].some(function(d){return dk(d.d)===k})}
 function setCur(n){cur=n;draws=store[n];try{localStorage.setItem('loto_sel',n)}catch(e){}resetResults();render()}
@@ -199,6 +249,7 @@ function importer(){
 function ball(n){return '<span class="b">'+n+'</span>'}
 function duos(){
   var el=document.getElementById('du');
+  var q=(document.getElementById('dq').value.match(/\d+/g)||[]).map(Number),minc=q.length?1:2;
   var sd=function(d){return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})};
   var sec=function(sz,label){
     var m={};
@@ -207,14 +258,15 @@ function duos(){
       var rec=function(st,cur){if(cur.length===sz){var k=cur.join('-');(m[k]||(m[k]=[])).push(d.d);return}for(var i=st;i<u.length;i++)rec(i+1,cur.concat(u[i]))};
       rec(0,[]);
     });
-    var l=Object.keys(m).filter(function(k){return m[k].length>=2}).sort(function(a,b){return m[b].length-m[a].length||parseInt(a)-parseInt(b)});
+    var l=Object.keys(m).filter(function(k){return m[k].length>=minc&&(!q.length||q.every(function(x){return k.split('-').map(Number).indexOf(x)>-1}))}).sort(function(a,b){return m[b].length-m[a].length||parseInt(a)-parseInt(b)});
     var h='<div class="lg" style="margin:10px 0 6px"><b>'+label+'</b> \u00b7 '+l.length+(l.length>30?' (30 premiers)':'')+'</div>';
-    if(!l.length)return h+'<div class="empty" style="padding:2px">Aucun répété</div>';
+    if(!l.length)return h+'<div class="empty" style="padding:2px">'+(q.length?'Aucune combinaison':'Aucun répété')+'</div>';
     return h+l.slice(0,30).map(function(k){
       return '<div class="dr"><div class="balls">'+k.split('-').map(function(x){return ball(+x)}).join('')+'</div><div class="lg" style="margin:0;text-align:right"><b>'+m[k].length+' fois</b> : '+m[k].slice().sort().map(sd).join(', ')+'</div></div>';
     }).join('');
   };
-  el.innerHTML=sec(2,'Duos (2 numéros)')+sec(3,'Triplés (3 numéros)')+sec(4,'Quadruplés (4 numéros)');
+  var note=q.length?'<div class="lg" style="margin:0 0 4px">Combinaisons contenant <b>'+q.join(' ')+'</b> (sorties 1 fois ou plus)</div>':'';
+  el.innerHTML=note+sec(2,'Duos (2 numéros)')+sec(3,'Triplés (3 numéros)')+sec(4,'Quadruplés (4 numéros)');
 }
 function searchDate(){
   var sr=document.getElementById('sr'),v=document.getElementById('sd').value;
@@ -292,21 +344,54 @@ function withBlock(v,ds,idx){
     '<div class="lg" style="margin:12px 0 6px"><b>Numéros sortis avec le '+v+'</b> \u00b7 '+l.length+' différents'+(l.length>20?' (20 premiers)':'')+'</div>'+
     '<div class="balls">'+l.slice(0,20).map(function(x){return '<span style="text-align:center">'+ball(x)+'<div class="lg" style="margin:2px 0 0"><b>'+co[x]+'\u00d7</b></div></span>'}).join('')+'</div>';
 }
+function missing(){
+  var el=document.getElementById('nd');
+  document.getElementById('mlabel').textContent=plabel(30);
+  var ds=pdr(draws,30);
+  if(!ds.length){el.innerHTML='<div class="empty">Aucun tirage sur cette période.</div>';return}
+  var seen={};
+  ds.forEach(function(d){d.n.forEach(function(x){seen[x]=1})});
+  var miss=[];for(var x=1;x<=90;x++)if(!seen[x])miss.push(x);
+  var h='<div class="lg" style="margin:0 0 8px"><b>'+miss.length+' numéro(s) sur 90</b> non tirés \u00b7 '+ds.length+' tirage(s) analysé(s)</div>';
+  if(!miss.length){el.innerHTML=h+'<div class="empty" style="padding:2px">Tous les numéros sont sortis.</div>';return}
+  el.innerHTML=h+'<div class="balls">'+miss.map(ball).join('')+'</div>';
+}
+function pairSearch(){
+  var el=document.getElementById('ppr');
+  document.getElementById('pairlabel').textContent=plabel(0);
+  var a=(document.getElementById('pp').value.match(/\d+/g)||[]).map(Number).filter(function(x,i,ar){return ar.indexOf(x)===i});
+  if(a.length!==2||a.some(function(x){return x<1||x>90})){el.innerHTML='<div class="empty">Entre deux numéros différents, de 1 à 90.</div>';return}
+  var fmt=function(d){return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})};
+  var tot=0,both=0,rows=[],tag='(BANKA) '+a[0]+' '+a[1];
+  NAMES.forEach(function(g){
+    var ds=pdr(store[g],0).sort(function(x,y){return x.d<y.d?1:-1}),hit=[];
+    ds.forEach(function(d){tot++;if(d.n.indexOf(a[0])>-1&&d.n.indexOf(a[1])>-1){both++;hit.push(d.d)}});
+    if(hit.length)rows.push({g:g,n:hit.length,d:hit});
+  });
+  rows.sort(function(x,y){return y.n-x.n||NAMES.indexOf(x.g)-NAMES.indexOf(y.g)});
+  var h='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><b>(BANKA)</b><div class="balls">'+a.map(ball).join('')+'</div></div>'+
+    '<div class="stat"><span>Paire sortie ensemble</span><b>'+both+' fois sur '+tot+' tirages</b></div>';
+  if(!rows.length){el.innerHTML=h+'<div class="empty" style="padding:6px">Cette paire n\u2019est jamais sortie ensemble sur cette période.</div>';return}
+  el.innerHTML=h+'<div class="lg" style="margin:10px 0 4px"><b>Dates d\u2019apparition de la paire, par jeu</b> \u00b7 '+rows.length+' jeu(x)</div>'+rows.map(function(r){
+    return '<div class="dr" style="flex-direction:column;align-items:flex-start;gap:3px"><div style="font-size:.9rem;font-weight:700">'+r.g+'</div>'+
+      '<div class="lg" style="margin:0"><b>'+tag+'</b> \u00b7 '+r.n+' fois : '+r.d.slice(0,15).map(fmt).join(', ')+(r.d.length>15?' …':'')+'</div></div>';
+  }).join('');
+}
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
-  var sl=document.getElementById('sel');
-  sl.innerHTML=NAMES.map(function(n,i){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+' ('+store[n].length+')'+(done(n)?' ✓':'')+'</option>'}).join('');
+  document.getElementById('games').innerHTML=NAMES.map(function(n){var m=n.match(/^(\d+)\*(.*)$/);return '<a href="#" data-g="'+n+'"'+(n===cur?' class="on" aria-current="page"':'')+' onclick="setCur(this.getAttribute(\'data-g\'));return false"><span class="n">'+(m?m[1]:'')+'</span><span class="t">'+(m?m[2]:n)+'</span>'+(done(n)?'<span class="ck">\u2713</span>':'')+'</a>'}).join('');
+  document.getElementById('gtitle').textContent=cur;
   document.querySelectorAll('.nm').forEach(function(x){x.textContent=cur});
   document.getElementById('nb').textContent=draws.length;
   document.getElementById('plabel').textContent=plabel(30);
   document.getElementById('tot').textContent='Aujourd\u2019hui : '+NAMES.filter(done).length+'/10 tirages enregistrés';
-  duos();
+  duos();missing();pairSearch();
   var h=document.getElementById('hist'),t=document.getElementById('top');
   if(!draws.length){h.innerHTML=t.innerHTML='<div class="empty">Aucun tirage enregistré pour '+cur+'.</div>';return}
   var dys=[],shown=draws.filter(function(d){var k=dk(d.d);if(dys.indexOf(k)<0)dys.push(k);return dys.indexOf(k)<=6});
   h.innerHTML=shown.map(function(d){
     var mu=mult(d.n),tg=(mu.dbl.length?' · Doublé : '+mu.dbl.join(', '):'')+(mu.tpl.length?' · Triplé : '+mu.tpl.join(', '):'');
-    return '<div class="dr"><div><div class="balls">'+d.n.map(ball).join('')+'</div><div class="lg">'+dk(d.d)+(d.s?' · 🎲 aléatoire':'')+tg+'</div></div><span title="Verrouillé">🔒</span></div>';
+    return '<div class="dr"><div><div class="balls">'+d.n.map(ball).join('')+'</div><div class="lg"><b>'+jour(d.d)+'</b> '+dk(d.d)+(d.s?' · 🎲 aléatoire':'')+tg+'</div></div><span title="Verrouillé">🔒</span></div>';
   }).join('');
   var fm={};
   var md=pdr(draws,30);
