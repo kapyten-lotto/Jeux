@@ -76,6 +76,7 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <a class="sec" href="#s-hist"><span class="n">H</span>Historique</a>
 <a class="sec" href="#s-top"><span class="n">T</span>Numéros les plus joués</a>
 <a class="sec" href="#s-pred"><span class="n">P</span>Prédiction</a>
+<a class="sec" href="#s-pastpred"><span class="n">PP</span>Prédiction passée</a>
 <a class="sec" href="#s-num"><span class="n">N</span>Recherche d'un numéro</a>
 <a class="sec" href="#s-pair"><span class="n">R</span>Recherche d'une paire</a>
 <a class="sec" href="#s-duo"><span class="n">D</span>Duos et triplés</a>
@@ -100,9 +101,14 @@ textarea{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border)
 <h2 id="s-pred">Prédiction · <span class="nm"></span></h2>
 <div class="card">
 <label>Nombre de numéros</label>
-<select id="pn"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select>
+<select id="pn" onchange="pastPred()"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select>
 <button onclick="predict()" style="margin-top:8px">🔮 Prédiction</button>
 <div id="pr" style="margin-top:10px"><div class="empty">Touche « Prédiction » pour analyser les tirages de ce jeu.</div></div>
+</div>
+
+<h2 id="s-pastpred">Prédiction passée · <span class="nm"></span></h2>
+<div class="card">
+<div id="ppastres"></div>
 </div>
 
 <h2 id="s-num">Recherche d'un numéro · <span class="nm"></span></h2>
@@ -377,6 +383,21 @@ function pairSearch(){
       '<div class="lg" style="margin:0"><b>'+tag+'</b> \u00b7 '+r.n+' fois : '+r.d.slice(0,15).map(fmt).join(', ')+(r.d.length>15?' …':'')+'</div></div>';
   }).join('');
 }
+function pastPred(){
+  var el=document.getElementById('ppastres'),N=parseInt(document.getElementById('pn').value)||5;
+  var all=store[cur];
+  if(!all.length){el.innerHTML='<div class="empty">Aucun tirage pour ce jeu.</div>';return}
+  var last=all.reduce(function(a,d){return d.d>a?d.d:a},'');
+  var ld=new Date(last),cut=new Date(ld.getFullYear(),ld.getMonth(),ld.getDate()-1,23,59,59);
+  var ds=all.filter(function(d){return new Date(d.d)<=cut});
+  var head='<div class="lg" style="margin:0 0 8px"><b>Prédiction de la veille</b> \u00b7 <b>'+dk(cut)+'</b> \u00b7 '+ds.length+' tirage(s)</div>';
+  if(ds.length<10){el.innerHTML=head+'<div class="empty" style="padding:2px">Pas assez de tirages (minimum 10).</div>';return}
+  var W=0,o={};
+  ds.forEach(function(d){W++;d.n.filter(function(x,j){return d.n.indexOf(x)===j}).forEach(function(x){o[x]=(o[x]||0)+1})});
+  var l=[];for(var y=1;y<=90;y++)l.push({x:y,p:((o[y]||0)+60*5/90)/(W+60)});
+  l.sort(function(a,b){return b.p-a.p||a.x-b.x});
+  el.innerHTML=head+'<div class="balls">'+l.slice(0,N).map(function(q){return '<span style="text-align:center">'+ball(q.x)+'<div class="lg" style="margin:2px 0 0"><b>'+(q.p*100).toFixed(1).replace('.',',')+' %</b></div></span>'}).join('')+'</div>';
+}
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
   document.getElementById('games').innerHTML=NAMES.map(function(n){var m=n.match(/^(\d+)\*(.*)$/);return '<a href="#" data-g="'+n+'"'+(n===cur?' class="on" aria-current="page"':'')+' onclick="setCur(this.getAttribute(\'data-g\'));return false"><span class="n">'+(m?m[1]:'')+'</span><span class="t">'+(m?m[2]:n)+'</span>'+(done(n)?'<span class="ck">\u2713</span>':'')+'</a>'}).join('');
@@ -384,6 +405,7 @@ function render(){
   document.querySelectorAll('.nm').forEach(function(x){x.textContent=cur});
   document.getElementById('nb').textContent=draws.length;
   document.getElementById('plabel').textContent=plabel(30);
+  pastPred();
   document.getElementById('tot').textContent='Aujourd\u2019hui : '+NAMES.filter(done).length+'/10 tirages enregistrés';
   duos();missing();pairSearch();
   var h=document.getElementById('hist'),t=document.getElementById('top');
