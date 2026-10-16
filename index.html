@@ -39,7 +39,7 @@ button,input,select,textarea{font-family:inherit}
 .pill{border:0;border-radius:999px;min-height:40px;padding:0 14px;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#fff}
 .pill.dark{background:#1A1A1A}.pill.red{background:#D3144A;font-weight:600}
 .hballs{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.hballs .b{width:38px;height:38px;background:#fff;font-weight:600;font-size:.95rem}
+.hballs .b{width:38px;height:38px;background:#FFB020;font-weight:800;font-size:.95rem}
 .h3{font-size:1.2rem;font-weight:800;margin:16px 0 10px;text-align:center}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .fc{border:0;background:#fff;border-radius:20px;min-height:112px;box-shadow:0 6px 16px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-weight:600;font-size:1rem;color:#1A1A1A;cursor:pointer;padding:10px;text-align:center}
@@ -56,7 +56,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #D3144A;border-color:#
 .mt{margin-top:10px}
 /* éléments générés par le script */
 .balls{display:flex;gap:6px;flex-wrap:wrap}
-.b{border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;color:#1A1A1A;background:#ECECEC}
+.b{border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;color:#2A1A00;background:#FFB020}
 .pred .b{background:#D3144A;color:#fff}
 .lg{font-size:.8rem;color:#6A6A6A;margin-top:6px}
 .dr{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #EEE;gap:8px}
@@ -81,6 +81,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid #D3144A;border-color:#
 .gap{width:64px}
 .flash{position:absolute;left:50%;margin-left:-34px;top:-26px;width:68px;height:68px;border-radius:50%;border:0;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
 .flash.on{background:#D3144A}.flash.on svg{stroke:#fff}
+.hot{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:0;background:#fff;border-radius:20px;box-shadow:0 6px 16px rgba(0,0,0,.08);padding:14px 16px;margin-top:14px;cursor:pointer;text-align:left;font-family:inherit}
+.hot-t{color:#FF1A1A;font-weight:800;font-size:1.25rem;letter-spacing:.02em;display:block}
+.hot-s{display:block;font-size:.8rem;color:#6A6A6A;margin-top:3px}
+.hot-b{display:flex;gap:12px;flex:none}
+.hot-b>div{text-align:center}
+.hot-b .b{width:40px;height:40px;font-size:1rem}
+.hot-b .n{font-size:.75rem;color:#6A6A6A;margin-top:3px;font-weight:600}
+.big2{display:flex;gap:18px;justify-content:center;margin:6px 0 14px}
+.big2>div{text-align:center}
+.big2 .b{width:64px;height:64px;font-size:1.5rem}
+.big2 .n{font-weight:800;margin-top:6px;font-size:.95rem}
+.big2 .lg{margin-top:2px}
 </style>
 </head>
 <body>
@@ -91,7 +103,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #D3144A;border-color:#
 <button class="ibtn" aria-label="Administration" onclick="go('admin')"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3.2"/><path d="M6 19c1.5-3 4-4 6-4s4.5 1 6 4"/></svg></button>
 </header>
 <div class="perbar" id="perbar"><label for="per">Période d'analyse</label>
-<select id="per" onchange="periodChanged()"><option value="def">Par défaut</option><option value="7">7 derniers jours</option><option value="14">14 derniers jours</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="all">Tous les tirages</option></select></div>
+<select id="per" onchange="periodChanged()"><option value="7">7 derniers jours</option><option value="14">14 derniers jours</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="all" selected>Tous les tirages</option></select></div>
 
 <section class="screen on" id="sc-home">
 <div class="hero">
@@ -102,6 +114,10 @@ input:focus,select:focus,textarea:focus{outline:2px solid #D3144A;border-color:#
 <div class="hballs" id="hres"></div>
 <div class="lg" id="tot" style="margin:0"></div>
 </div>
+<button class="hot" onclick="go('hot')" aria-label="Chaud du jour : les 2 numéros les plus tirés">
+<span><span class="hot-t">CHAUD DU JOUR</span><span class="hot-s">Les 2 numéros les plus tirés · <span id="hotsub"></span></span></span>
+<span class="hot-b" id="hotballs"></span>
+</button>
 <div class="h3">LA CHANCE EST AVEC NOUS</div>
 <div class="grid2">
 <button class="fc" onclick="go('hist')"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#D3144A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Historique 7 jours</button>
@@ -110,6 +126,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid #D3144A;border-color:#
 <button class="fc" onclick="go('old')"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#B86E00" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg>Anciens résultats</button>
 </div>
 <div class="ycard"><button class="btn" style="width:auto" onclick="go('pred')">Prédiction</button></div>
+</section>
+
+<section class="screen" id="sc-hot">
+<div class="shead"><button class="back" onclick="go('home')" aria-label="Retour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><div class="stitle" style="color:#FF1A1A">CHAUD DU JOUR</div></div>
+<div class="sub">Numéros les plus tirés, tous les jeux · <span id="hotlabel"></span></div>
+<div class="card" id="hotlist"></div>
 </section>
 
 <section class="screen" id="sc-games">
@@ -438,7 +460,7 @@ function go(n){
   var map={hist:'home',top:'home',duos:'home',old:'home',pred:'pred'},nv=map[n]||n;
   document.querySelectorAll('.navb').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-s')===nv)});
   document.getElementById('flashbtn').classList.toggle('on',n==='pred');
-  document.getElementById('perbar').className='perbar'+((n==='top'||n==='duos'||n==='pred'||n==='stats')?' on':'');
+  document.getElementById('perbar').className='perbar'+((n==='home'||n==='hot'||n==='top'||n==='duos'||n==='pred'||n==='stats')?' on':'');
   window.scrollTo(0,0);
 }
 function lastDateAll(){var ml='';NAMES.forEach(function(g){store[g].forEach(function(d){if(d.d>ml)ml=d.d})});return ml}
@@ -453,11 +475,31 @@ function seeAll(){
   if(ml){var q=new Date(ml);document.getElementById('sd').value=q.getFullYear()+'-'+('0'+(q.getMonth()+1)).slice(-2)+'-'+('0'+q.getDate()).slice(-2);}
   go('old');searchDate();
 }
+function hotRank(){
+  var c={},nd=0;
+  NAMES.forEach(function(g){pdr(store[g],30).forEach(function(d){nd++;uniq(d.n).forEach(function(x){c[x]=(c[x]||0)+1})})});
+  var l=Object.keys(c).map(Number).sort(function(a,b){return c[b]-c[a]||a-b});
+  return {c:c,l:l,nd:nd};
+}
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
+function renderHot(){
+  var h=hotRank(),lab=plabel(30);
+  document.getElementById('hotsub').textContent=lab;
+  document.getElementById('hotlabel').textContent=lab+' · '+h.nd+' tirage(s)';
+  var b=document.getElementById('hotballs'),L=document.getElementById('hotlist');
+  if(!h.l.length){b.innerHTML='';L.innerHTML='<div class="empty">Aucun tirage sur cette période.</div>';return}
+  var top=h.l.slice(0,2);
+  b.innerHTML=top.map(function(x){return '<div>'+ball(x)+'<div class="n">'+h.c[x]+'\u00d7</div></div>'}).join('');
+  var mx=h.c[h.l[0]];
+  L.innerHTML='<div class="big2">'+top.map(function(x){return '<div>'+ball(x)+'<div class="n">'+h.c[x]+' fois</div><div class="lg">'+(h.c[x]/h.nd*100).toFixed(1).replace('.',',')+' % des tirages</div></div>'}).join('')+'</div>'+
+    '<div class="lg" style="margin:0 0 6px"><b>Les 10 plus tirés</b></div>'+
+    h.l.slice(0,10).map(function(x){return '<div class="tr"><span class="n">'+ball(x)+'</span><span class="bar"><i style="width:'+(h.c[x]/mx*100)+'%"></i></span><span class="c">'+h.c[x]+'\u00d7</span></div>'}).join('');
+}
 function mult(a){var c={},r={dbl:[],tpl:[]};a.forEach(function(x){c[x]=(c[x]||0)+1});Object.keys(c).forEach(function(k){if(c[k]===2)r.dbl.push(+k);else if(c[k]>=3)r.tpl.push(+k)});return r}
 function render(){
   document.getElementById('games').innerHTML=NAMES.map(function(n){var m=n.match(/^(\d+)\*(.*)$/);return '<a href="#" data-g="'+n+'"'+(n===cur?' class="on" aria-current="page"':'')+' onclick="setCur(this.getAttribute(\'data-g\'));go(\'home\');return false"><span class="gn">'+(m?m[1]:'')+'</span><span class="gt">'+(m?m[2]:n)+'</span><span class="gc">'+store[n].length+' tirages'+(done(n)?' \u00b7 \u2713':'')+'</span></a>'}).join('');
   document.getElementById('gtitle').textContent=cur;
-  renderHome();
+  renderHome();renderHot();
   document.querySelectorAll('.nm').forEach(function(x){x.textContent=cur});
   document.getElementById('nb').textContent=draws.length;
   document.getElementById('plabel').textContent=plabel(30);
