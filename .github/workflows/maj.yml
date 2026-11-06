@@ -23,4 +23,3 @@ jobs:
             git commit -m "Mise à jour des tirages"
             git push
           fi
-          
