@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: "15 0,8,13,17,21,23 * * *"
   workflow_dispatch:
+    inputs:
+      mois:
+        description: "Nombre de mois précédents à relire (0 = page actuelle seulement)"
+        default: "0"
 permissions:
   contents: write
 jobs:
@@ -14,7 +18,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install playwright && playwright install --with-deps chromium
-      - run: python maj.py
+      - run: python maj.py "$MOIS"
+        env:
+          MOIS: ${{ github.event.inputs.mois || '0' }}
       - run: |
           if [ -n "$(git status --porcelain tirages.txt)" ]; then
             git config user.name "maj-auto"
