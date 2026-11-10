@@ -56,6 +56,8 @@ nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:flex-end;jus
 nav button{flex:1;border:0;background:none;color:var(--mu);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 0}nav button.on{color:var(--ac);font-weight:700}
 nav .fab{flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:var(--card);color:var(--ac);margin-top:-24px;box-shadow:0 2px 12px rgba(0,0,0,.15);justify-content:center}
 .tile svg{width:30px;height:30px}nav svg{width:22px;height:22px}nav .fab svg{width:24px;height:24px}header svg{width:24px;height:24px}.hot{padding:8px 12px}.hot h2{font-size:14px}#hot2{display:flex;flex-direction:row;align-items:center;gap:12px}.hot .hc{margin:0}.hot .b.big{width:34px;height:34px;font-size:14px}#hg{padding:3px 6px;font-size:12px;border-radius:8px;max-width:160px}
+.b.red{background:#d9261c;color:#fff}
+#s-pred .b{width:26px;height:26px;font-size:11px;margin:2px 3px 2px 0}
 </style>
 </head>
 <body>
@@ -85,7 +87,7 @@ nav .fab{flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:var(-
 
 <section id="s-games" class="sec"><div class="card"><h2>Les jeux</h2><div class="mu">Chaque jeu a sa propre base de données.</div><select id="gs" style="margin:8px 0;width:100%"></select><div id="gdet"></div></div></section>
 
-<section id="s-pred" class="sec"><div class="card"><h2>Prédiction</h2><div id="pout"></div><div class="warn" style="margin-top:10px">Indicatif seulement : un tirage est aléatoire, aucune méthode ne garantit un gain.</div></div>
+<section id="s-pred" class="sec"><div class="card"><h2>Prédiction</h2><div id="pout"></div><div class="row" style="margin-top:8px"><button class="p" id="bb">Meilleure prédiction</button></div><div id="best"></div><div class="warn" style="margin-top:10px">Indicatif seulement : un tirage est aléatoire, aucune méthode ne garantit un gain.</div></div>
 <div class="card"><h2>Prédiction passée</h2><div id="plast"></div></div></section>
 
 <section id="s-stats" class="sec">
@@ -148,17 +150,23 @@ L.forEach(function(x){top.forEach(function(t){if(x.n.indexOf(t)>-1&&f[t])x.n.for
 var mc=Math.max.apply(null,Object.keys(co).map(function(i){return co[i]}))||1,sc=[];
 for(var n=1;n<=90;n++)sc.push({n:n,s:f[n]/mx*0.5+co[n]/mc*0.2+fm[n]/mm*0.3});
 return sc.sort(function(a,b){return b.s-a.s||a.n-b.n}).slice(0,k).map(function(x){return x.n}).sort(function(a,b){return a-b})}
-function predict(){var P=[[7,"7 jours"],[15,"15 jours"],[30,"30 jours"],[90,"90 jours"],[0,"Tous les tirages"]],o1="",o2="";
+var PR=[];
+function predict(){var P=[[7,"7 jours"],[15,"15 jours"],[30,"30 jours"],[90,"90 jours"],[0,"Tous les tirages"]],o1="",o2="";PR=[];
 P.forEach(function(p){var cs="";if(p[0]){var c=new Date();c.setDate(c.getDate()-p[0]);cs=iso(c)}
 var A=D().filter(function(x){return !cs||x.d>=cs}).sort(function(a,b){return a.d<b.d?1:-1}),AM=draws.filter(function(x){return x.t==="M"&&(!cs||x.d>=cs)});
 if(!A.length){o1+='<div class="g" style="display:block"><b>'+p[1]+'</b> <span class="mu">pas assez de tirages</span></div>';return}
-o1+='<div class="g" style="display:block"><b>'+p[1]+'</b><span class="mu"> · '+A.length+' tirages · score = fréquence + probabilité + machine</span><div>'+balls(calc(A,AM,5))+'</div></div>';
+var pr=calc(A,AM,5);PR.push(pr);
+o1+='<div class="g" style="display:block"><b>'+p[1]+'</b><span class="mu"> · '+A.length+' tirages · score = fréquence + probabilité + machine</span><div>'+balls(pr)+'</div></div>';
 var last=A[0].d,B=A.filter(function(x){return x.d<last}),BM=AM.filter(function(x){return x.d<last});
 if(!B.length){o2+='<div class="g" style="display:block"><b>'+p[1]+'</b> <span class="mu">pas assez de tirages avant le '+fr(last)+'</span></div>';return}
 var S={};A.filter(function(x){return x.d===last}).forEach(function(x){x.n.forEach(function(n){S[n]=(S[n]||[]).concat(x.g)})});
 var pp=calc(B,BM,5),hit=pp.filter(function(n){return S[n]}).length;
 o2+='<div class="g" style="display:block"><b>'+p[1]+'</b> <span class="mu">· jusqu’au '+fr(B[0].d)+'</span><div>'+pp.map(function(n){return ball(n,S[n]?"sm":"sm off")}).join("")+'</div><div class="mu">'+hit+'/5 numéros sortis le '+fr(last)+'</div>'+pp.filter(function(n){return S[n]}).map(function(n){return '<div class="mu" style="margin-top:4px">'+ball(n,"sm")+' sorti dans : '+S[n].join(", ")+'</div>'}).join("")+'</div>'});
-$("pout").innerHTML=o1;$("plast").innerHTML=o2}
+$("pout").innerHTML=o1;$("plast").innerHTML=o2;$("best").innerHTML=""}
+function best(){if(!PR.length)predict();var c={};PR.forEach(function(p){p.forEach(function(n){c[n]=(c[n]||0)+1})});
+var ns=Object.keys(c).map(Number).filter(function(n){return c[n]>=2}).sort(function(a,b){return c[b]-c[a]||a-b});
+$("best").innerHTML='<div style="font-weight:800;color:#d9261c;margin:10px 0 4px">Toute meilleure prédiction</div>'+(ns.length?'<div>'+ns.map(function(n){return ball(n,"red")+'<span class="mu" style="margin-right:6px">'+c[n]+'×</span>'}).join("")+'</div><div class="mu">Numéros présents dans au moins 2 des '+PR.length+' prédictions.</div>':'<div class="mu">Aucun numéro présent dans 2 prédictions.</div>')}
+
 function stats(){var L=period(),f=freq(L),nd=[];for(var n=1;n<=90;n++)if(!f[n])nd.push(n);
 $("nd").innerHTML='<div class="mu">'+nd.length+' numéro(s) non tirés sur la période</div>'+(nd.length?balls(nd,"sm off"):"")}
 function qnum(){var n=+$("qn").value;if(n<1||n>90){$("qo").textContent="Entre un numéro de 1 à 90.";return}
@@ -180,7 +188,7 @@ function parseTxt(tx){var cur="G",out=[];tx.split("\n").forEach(function(line){l
 function sync(){var sy=$("sy");sy.textContent="Synchronisation…";fetch("tirages.txt?v="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw "HTTP "+r.status;return r.text()}).then(function(tx){var rem=parseTxt(tx);if(!rem.length){sy.textContent="Fichier lu mais aucun tirage reconnu.";return}var m={};draws.forEach(function(x){m[x.d+"|"+x.g+"|"+x.t]=x});rem.forEach(function(x){m[x.d+"|"+x.g+"|"+x.t]=x;if(GAMES.indexOf(x.g)<0)GAMES.push(x.g)});draws=Object.keys(m).map(function(k){return m[k]});save();$("ig").innerHTML=GAMES.map(function(g){return '<option value="'+g+'">'+gname(g)+'</option>'}).join("");refresh();var mx=draws.reduce(function(a,x){return x.d>a?x.d:a},"");sy.textContent="Synchronisé : "+rem.length+" lignes lues, "+draws.length+" en base, dernier jour "+fr(mx)}).catch(function(e){sy.textContent="Échec de la synchronisation : "+e})}
 function init(){load();var o=GAMES.map(function(g){return '<option value="'+g+'">'+gname(g)+'</option>'}).join("");$("ig").innerHTML=o;
 $("od").value=iso(new Date());refresh();sync()}
-$("per").onchange=function(){home();stats()};$("ck").onchange=combo;$("ob").onclick=old;$("qb").onclick=qnum;$("pbt").onclick=qpair;$("ib").onclick=imp;$("sb").onclick=sync;
+$("per").onchange=function(){home();stats()};$("ck").onchange=combo;$("ob").onclick=old;$("qb").onclick=qnum;$("pbt").onclick=qpair;$("ib").onclick=imp;$("bb").onclick=best;$("sb").onclick=sync;
 $("rb").onclick=function(){if(confirm("Effacer tous les tirages ?")){draws=[];demo=false;save();refresh()}};
 $("eb").onclick=function(){var o=[];["G","M"].forEach(function(k){o.push("# "+(k==="G"?"GAGNANTS":"MACHINE"));draws.filter(function(x){return x.t===k}).forEach(function(x){o.push(fr(x.d)+" ; "+x.g+" ; "+x.n.join(" "))})});$("et").value=o.join("\n")};
 $("cb").onclick=function(){try{$("et").select();navigator.clipboard.writeText($("et").value)}catch(e){}};
