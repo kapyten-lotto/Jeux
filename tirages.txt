@@ -2,6 +2,8 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+10/11/2026 ; Emergence ; 61 50 52 88 76
+10/11/2026 ; Sika ; 32 18 43 36 69
 10/11/2026 ; Soleil ; 80 38 68 46 33
 10/11/2026 ; La Matinale ; 57 8 52 88 63
 10/11/2026 ; Digital Reveil 7h ; 72 78 15 29 74
@@ -2955,6 +2957,8 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+10/11/2026 ; Emergence ; 36 77 28 8 62
+10/11/2026 ; Sika ; 31 33 7 37 10
 10/11/2026 ; Soleil ; 37 12 70 71 86
 10/11/2026 ; La Matinale ; 32 72 84 14 66
 10/11/2026 ; Digital Reveil 7h ; 24 53 9 35 42
