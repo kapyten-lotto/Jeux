@@ -1,7 +1,7 @@
 name: Mise à jour des tirages
 on:
   schedule:
-    - cron: "15 0,8,13,17,21,23 * * *"
+    - cron: "7,37 * * * *"
   workflow_dispatch:
     inputs:
       mois:
