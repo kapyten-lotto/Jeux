@@ -2,6 +2,7 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+12/11/2026 ; Digital 21h ; 15 38 7 74 84
 12/11/2026 ; Afterwork ; 51 46 56 28 43
 12/11/2026 ; Monni ; 27 18 69 7 15
 12/11/2026 ; Privilege ; 87 80 70 26 82
@@ -2976,6 +2977,7 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+12/11/2026 ; Digital 21h ; 34 18 41 86 42
 12/11/2026 ; Afterwork ; 57 39 23 20 29
 12/11/2026 ; Monni ; 64 24 68 40 81
 12/11/2026 ; Privilege ; 4 44 1 21 55
