@@ -144,11 +144,11 @@ $("old").innerHTML=r.length?'<div class="mu">'+fr(v)+'</div>'+LG+r.map(function(
 function games(g){g=g||GAMES[0];$("gs").innerHTML=GAMES.map(function(x){return '<option'+(x===g?' selected':'')+'>'+x+'</option>'}).join("");
 var L=rows(draws.filter(function(x){return x.g===g})).sort(function(a,b){return a.d<b.d?1:-1});
 $("gdet").innerHTML='<div class="mu" style="margin:8px 0">'+L.length+' tirages en base</div>'+LG+L.slice(0,10).map(function(r){return resRow(r,1)}).join("")}
-function calc(L,M,k){var f=freq(L),fm=freq(M),mx=Math.max.apply(null,Object.keys(f).map(function(i){return f[i]}))||1,mm=Math.max.apply(null,Object.keys(fm).map(function(i){return fm[i]}))||1,top=topN(f,5),co={};
+function calc(L,M,k){var f=freq(L),fm=freq(M),mx=Math.max.apply(null,Object.keys(f).map(function(i){return f[i]}))||1,mm=Math.max.apply(null,Object.keys(fm).map(function(i){return fm[i]}))||1,top=topN(f,5),co={},ls={},last=L.length?L[0].d:"";
 for(var n=1;n<=90;n++)co[n]=0;
-L.forEach(function(x){top.forEach(function(t){if(x.n.indexOf(t)>-1&&f[t])x.n.forEach(function(n){if(n!==t)co[n]+=1/f[t]})})});
+L.forEach(function(x){x.n.forEach(function(n){if(!ls[n])ls[n]=x.d});top.forEach(function(t){if(x.n.indexOf(t)>-1&&f[t])x.n.forEach(function(n){if(n!==t)co[n]+=1/f[t]})})});
 var mc=Math.max.apply(null,Object.keys(co).map(function(i){return co[i]}))||1,sc=[];
-for(var n=1;n<=90;n++)sc.push({n:n,s:f[n]/mx*0.5+co[n]/mc*0.2+fm[n]/mm*0.3});
+for(var n=1;n<=90;n++){var gap=ls[n]?Math.round((new Date(last)-new Date(ls[n]))/864e5):7;sc.push({n:n,s:f[n]/mx*0.5+co[n]/mc*0.1+fm[n]/mm*0.2+Math.min(gap/7,1)*0.2})}
 return sc.sort(function(a,b){return b.s-a.s||a.n-b.n}).slice(0,k).map(function(x){return x.n}).sort(function(a,b){return a-b})}
 var PR=[];
 function predict(){var P=[[7,"7 jours"],[15,"15 jours"],[30,"30 jours"],[90,"90 jours"],[0,"Tous les tirages"]],o1="",o2="";PR=[];
@@ -156,7 +156,7 @@ P.forEach(function(p){var cs="";if(p[0]){var c=new Date();c.setDate(c.getDate()-
 var A=D().filter(function(x){return !cs||x.d>=cs}).sort(function(a,b){return a.d<b.d?1:-1}),AM=draws.filter(function(x){return x.t==="M"&&(!cs||x.d>=cs)});
 if(!A.length){o1+='<div class="g" style="display:block"><b>'+p[1]+'</b> <span class="mu">pas assez de tirages</span></div>';return}
 var pr=calc(A,AM,5);PR.push(pr);
-o1+='<div class="g" style="display:block"><b>'+p[1]+'</b><span class="mu"> · '+A.length+' tirages · score = fréquence + probabilité + machine</span><div>'+balls(pr)+'</div></div>';
+o1+='<div class="g" style="display:block"><b>'+p[1]+'</b><span class="mu"> · '+A.length+' tirages · score = fréquence + probabilité + machine + retard</span><div>'+balls(pr)+'</div></div>';
 var last=A[0].d,B=A.filter(function(x){return x.d<last}),BM=AM.filter(function(x){return x.d<last});
 if(!B.length){o2+='<div class="g" style="display:block"><b>'+p[1]+'</b> <span class="mu">pas assez de tirages avant le '+fr(last)+'</span></div>';return}
 var S={};A.filter(function(x){return x.d===last}).forEach(function(x){x.n.forEach(function(n){S[n]=(S[n]||[]).concat(x.g)})});
