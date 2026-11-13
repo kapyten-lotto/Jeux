@@ -2,6 +2,8 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+13/11/2026 ; Wari ; 89 49 54 67 19
+13/11/2026 ; Afterwork ; 70 68 7 37 26
 13/11/2026 ; Solution ; 8 45 22 44 11
 13/11/2026 ; Soleil ; 62 69 80 34 25
 13/11/2026 ; Cash ; 63 26 75 50 81
@@ -2983,6 +2985,8 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+13/11/2026 ; Wari ; 66 79 43 13 17
+13/11/2026 ; Afterwork ; 90 53 59 88 62
 13/11/2026 ; Solution ; 60 20 67 47 87
 13/11/2026 ; Soleil ; 20 40 82 73 42
 13/11/2026 ; Cash ; 12 72 60 61 89
