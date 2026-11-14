@@ -2,6 +2,8 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+14/11/2026 ; Moaye ; 83 34 54 72 5
+14/11/2026 ; Afterwork ; 7 33 82 8 10
 14/11/2026 ; Soutra ; 87 23 52 13 17
 14/11/2026 ; Diamant ; 70 37 50 18 19
 14/11/2026 ; Special Weekend 3h ; 19 25 20 30 77
@@ -2994,6 +2996,8 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+14/11/2026 ; Moaye ; 78 20 90 26 31
+14/11/2026 ; Afterwork ; 24 9 80 90 69
 14/11/2026 ; Soutra ; 90 6 80 24 75
 14/11/2026 ; Diamant ; 43 36 85 74 86
 14/11/2026 ; Special Weekend 3h ; 80 74 72 53 89
