@@ -2,6 +2,8 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+15/11/2026 ; Awale ; 76 64 63 48 16
+15/11/2026 ; Afterwork ; 81 86 58 51 71
 15/11/2026 ; Soleil ; 79 62 10 81 88
 15/11/2026 ; Benediction ; 64 33 16 22 71
 15/11/2026 ; Prestige ; 29 11 28 35 43
@@ -3005,6 +3007,8 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+15/11/2026 ; Awale ; 36 30 3 34 37
+15/11/2026 ; Afterwork ; 43 50 38 18 66
 15/11/2026 ; Soleil ; 83 34 75 76 16
 15/11/2026 ; Benediction ; 37 90 11 35 2
 15/11/2026 ; Prestige ; 38 54 37 75 59
