@@ -2,6 +2,10 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+16/11/2026 ; Soleil ; 48 38 21 5 68
+16/11/2026 ; Reveil ; 24 66 54 63 45
+16/11/2026 ; Etoile ; 65 79 88 87 45
+16/11/2026 ; Akwaba ; 76 29 60 19 67
 16/11/2026 ; Digital Reveil 7h ; 19 54 37 39 20
 15/11/2026 ; Digital 21h ; 65 48 77 15 14
 15/11/2026 ; Digital 22h ; 60 83 33 63 89
@@ -3011,6 +3015,10 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+16/11/2026 ; Soleil ; 36 57 73 59 78
+16/11/2026 ; Reveil ; 51 8 20 28 59
+16/11/2026 ; Etoile ; 2 29 59 28 46
+16/11/2026 ; Akwaba ; 24 81 10 18 49
 16/11/2026 ; Digital Reveil 7h ; 64 10 38 82 62
 15/11/2026 ; Digital 21h ; 36 79 21 82 30
 15/11/2026 ; Digital 22h ; 11 22 78 44 75
