@@ -2,6 +2,10 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+19/11/2026 ; Digital 21h ; 74 30 33 4 49
+19/11/2026 ; Digital 22h ; 53 6 49 69 40
+19/11/2026 ; Digital 23h ; 2 8 35 20 85
+19/11/2026 ; Afterwork ; 55 17 78 35 63
 19/11/2026 ; Soleil ; 17 26 87 21 68
 19/11/2026 ; Kado ; 90 51 74 48 13
 19/11/2026 ; Privilege ; 77 84 27 38 82
@@ -3042,6 +3046,10 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+19/11/2026 ; Digital 21h ; 13 64 60 11 89
+19/11/2026 ; Digital 22h ; 66 2 89 64 30
+19/11/2026 ; Digital 23h ; 30 37 53 78 31
+19/11/2026 ; Afterwork ; 40 13 43 49 41
 19/11/2026 ; Soleil ; 2 1 7 73 74
 19/11/2026 ; Kado ; 82 25 83 52 59
 19/11/2026 ; Privilege ; 52 61 49 19 14
