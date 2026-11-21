@@ -2,6 +2,9 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+21/11/2026 ; Diamant ; 58 34 55 5 60
+21/11/2026 ; Moaye ; 55 25 33 11 31
+21/11/2026 ; Afterwork ; 80 72 83 30 12
 21/11/2026 ; Digital Reveil 7h ; 22 18 80 84 87
 21/11/2026 ; Soleil ; 43 57 82 66 6
 21/11/2026 ; Soutra ; 88 45 9 58 33
@@ -3060,6 +3063,9 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+21/11/2026 ; Diamant ; 65 48 3 75 57
+21/11/2026 ; Moaye ; 35 42 81 22 14
+21/11/2026 ; Afterwork ; 54 58 17 47 7
 21/11/2026 ; Digital Reveil 7h ; 29 30 16 17 54
 21/11/2026 ; Soleil ; 22 1 5 80 69
 21/11/2026 ; Soutra ; 89 52 51 57 18
