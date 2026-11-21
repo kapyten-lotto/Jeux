@@ -2,6 +2,9 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+21/11/2026 ; Digital Reveil 7h ; 22 18 80 84 87
+21/11/2026 ; Soleil ; 43 57 82 66 6
+21/11/2026 ; Soutra ; 88 45 9 58 33
 21/11/2026 ; Special Weekend 1h ; 86 13 40 47 1
 21/11/2026 ; Special Weekend 3h ; 63 14 81 67 72
 20/11/2026 ; Digital 23h ; 53 54 68 7 9
@@ -3057,6 +3060,9 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+21/11/2026 ; Digital Reveil 7h ; 29 30 16 17 54
+21/11/2026 ; Soleil ; 22 1 5 80 69
+21/11/2026 ; Soutra ; 89 52 51 57 18
 21/11/2026 ; Special Weekend 1h ; 59 68 49 16 24
 21/11/2026 ; Special Weekend 3h ; 53 23 33 39 36
 20/11/2026 ; Digital 23h ; 63 72 32 88 59
