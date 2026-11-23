@@ -2,6 +2,8 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+22/11/2026 ; Digital 22h ; 49 85 79 75 6
+22/11/2026 ; Digital 23h ; 73 1 44 11 75
 22/11/2026 ; Digital 21h ; 66 49 62 81 10
 22/11/2026 ; Awale ; 71 16 69 56 26
 22/11/2026 ; Afterwork ; 41 14 44 11 70
@@ -3075,6 +3077,8 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+22/11/2026 ; Digital 22h ; 66 86 73 88 47
+22/11/2026 ; Digital 23h ; 2 68 35 66 33
 22/11/2026 ; Digital 21h ; 21 88 60 72 84
 22/11/2026 ; Awale ; 38 30 20 78 6
 22/11/2026 ; Afterwork ; 89 18 73 56 86
