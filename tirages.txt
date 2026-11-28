@@ -2,6 +2,10 @@
 # Pour ajouter des tirages : colle les nouvelles lignes sous la bonne section, puis « Commit changes ».
 
 # GAGNANTS
+28/11/2026 ; Soleil ; 49 27 41 50 40
+28/11/2026 ; Soutra ; 56 24 89 37 33
+28/11/2026 ; Diamant ; 69 11 5 70 22
+28/11/2026 ; Moaye ; 40 49 86 65 52
 28/11/2026 ; Special Weekend 1h ; 55 23 47 85 56
 28/11/2026 ; Special Weekend 3h ; 4 5 73 58 80
 28/11/2026 ; Digital Reveil 7h ; 2 58 8 39 61
@@ -3125,6 +3129,10 @@
 01/01/2026 ; Day Off ; 46 74 17 44 40
 
 # MACHINE
+28/11/2026 ; Soleil ; 72 32 24 53 51
+28/11/2026 ; Soutra ; 34 39 21 78 85
+28/11/2026 ; Diamant ; 71 28 76 2 18
+28/11/2026 ; Moaye ; 17 53 18 62 85
 28/11/2026 ; Special Weekend 1h ; 63 53 6 29 74
 28/11/2026 ; Special Weekend 3h ; 44 56 69 49 26
 28/11/2026 ; Digital Reveil 7h ; 90 63 89 60 77
